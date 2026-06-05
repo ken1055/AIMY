@@ -1,0 +1,15 @@
+# API キー等の設定ファイル（コミット禁止）
+config.js
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# OS 生成ファイル
+.DS_Store
+Thumbs.db

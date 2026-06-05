@@ -1,0 +1,3026 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>お悩みに基づく 肌診断レポート</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@200;300;400;500;600;700;800&family=Outfit:wght@200;300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    :root {
+      --g100: #f0f1f5;
+      --g200: #e2e4eb;
+      --g300: #cdd1dc;
+      --g400: #9ca3b8;
+      --g500: #6b7280;
+      --g600: #4b5563;
+      --g700: #374151;
+      --g800: #1f2937;
+      --g900: #111827;
+      --navy: #1a237e;
+      --blue: #4f7df5;
+      --green: #22c55e;
+      --red: #d4425c;
+      --amber: #f59e0b;
+      --jp: 'Noto Sans JP', sans-serif;
+      --en: 'Outfit', 'Noto Sans JP', sans-serif
+    }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth
+    }
+
+    body {
+      font-family: var(--jp);
+      color: var(--g800);
+      background: #e8ecf4;
+      overflow-x: hidden;
+      margin: 0
+    }
+
+    .bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background: linear-gradient(145deg, #eff1f8, #e4e8f2 40%, #dde2f0 70%, #e8ecf4);
+      overflow: hidden
+    }
+
+    .bk {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(65px);
+      will-change: transform
+    }
+
+    .bk1 {
+      width: 520px;
+      height: 520px;
+      background: radial-gradient(circle, rgba(26, 35, 126, 0.22), rgba(48, 64, 184, 0.1) 35%, transparent 60%);
+      right: -6%;
+      top: 0;
+      animation: b1 18s ease-in-out infinite alternate
+    }
+
+    .bk2 {
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(63, 81, 181, 0.18), transparent 55%);
+      left: 0;
+      top: 38%;
+      animation: b2 22s ease-in-out infinite alternate
+    }
+
+    .bk3 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(26, 35, 126, 0.18), transparent 55%);
+      right: 8%;
+      bottom: 3%;
+      animation: b3 20s ease-in-out infinite alternate
+    }
+
+    @keyframes b1 {
+      0% {
+        transform: translate(0, 0) scale(1)
+      }
+
+      100% {
+        transform: translate(-90px, 70px) scale(1.15)
+      }
+    }
+
+    @keyframes b2 {
+      0% {
+        transform: translate(0, 0)
+      }
+
+      100% {
+        transform: translate(70px, -50px) scale(1.1)
+      }
+    }
+
+    @keyframes b3 {
+      0% {
+        transform: translate(0, 0)
+      }
+
+      100% {
+        transform: translate(-50px, -70px) scale(1.12)
+      }
+    }
+
+    .lg {
+      position: relative;
+      overflow: hidden
+    }
+
+    .lg>.e {
+      position: absolute;
+      z-index: 0;
+      inset: 0;
+      backdrop-filter: blur(4px);
+      filter: url(#gd);
+      overflow: hidden;
+      isolation: isolate
+    }
+
+    .lg>.t {
+      z-index: 1;
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.3)
+    }
+
+    .lg>.s {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      overflow: hidden;
+      box-shadow: inset 2px 2px 1px rgba(255, 255, 255, 0.55), inset -1px -1px 1px 1px rgba(255, 255, 255, 0.35)
+    }
+
+    .lg>.c {
+      position: relative;
+      z-index: 3
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 20px 80px
+    }
+
+    .gc {
+      border-radius: 20px;
+      margin: 20px 0;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08), 0 0 20px rgba(0, 0, 0, 0.04)
+    }
+
+    .gc>.t {
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.38)
+    }
+
+    .gc>.s {
+      border-radius: 20px;
+      box-shadow: inset 2px 2px 2px rgba(255, 255, 255, 0.6), inset -1px -1px 1px rgba(255, 255, 255, 0.3)
+    }
+
+    .gc>.e {
+      border-radius: 20px;
+      backdrop-filter: blur(5px)
+    }
+
+    .gc>.c {
+      padding: 24px 20px
+    }
+
+    .rh {
+      text-align: center;
+      padding: 50px 0 20px
+    }
+
+    .rh h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--g900);
+      margin-bottom: 6px
+    }
+
+    .rh .sub {
+      font-size: 12px;
+      color: var(--g400)
+    }
+
+    .rh .dv {
+      width: 50px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--navy), transparent);
+      margin: 14px auto 0
+    }
+
+    .st {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--g900);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .st .ic {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0
+    }
+
+    .ss {
+      font-size: 12px;
+      color: var(--g400);
+      margin-bottom: 16px;
+      padding-left: 36px
+    }
+
+    /* PATIENT */
+    .pat>.c {
+      display: flex;
+      align-items: center;
+      gap: 16px
+    }
+
+    .pat-photo {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      overflow: hidden;
+      flex-shrink: 0;
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 4px 12px rgba(26, 35, 126, 0.1)
+    }
+
+    .pat-info {
+      font-size: 13px;
+      color: var(--g600);
+      line-height: 1.8
+    }
+
+    .pat-info strong {
+      color: var(--g800);
+      font-weight: 600
+    }
+
+    /* FUTURE */
+    .ff {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      margin: 14px 0
+    }
+
+    .fc {
+      flex: 1;
+      text-align: center
+    }
+
+    .fc .yr {
+      font-family: var(--en);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--g400);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px
+    }
+
+    .fc .yr span {
+      display: block;
+      font-size: 16px;
+      color: var(--g800);
+      font-weight: 700;
+      margin-top: 2px
+    }
+
+    .fi {
+      width: 100%;
+      aspect-ratio: 3/4;
+      max-width: 180px;
+      margin: 0 auto;
+      border-radius: 14px;
+      overflow: hidden;
+      position: relative;
+      background: var(--g100);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 4px 16px rgba(26, 35, 126, 0.06)
+    }
+
+    .fi .ph {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: var(--g400)
+    }
+
+    .fi img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 18%;
+      transform: scale(1.18);
+      transform-origin: center 28%;
+      display: block
+    }
+
+    .fi .so {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 5
+    }
+
+    .sl {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent 5%, rgba(79, 125, 245, 0.35) 50%, transparent 95%);
+      animation: isc 4s ease-in-out infinite
+    }
+
+    @keyframes isc {
+      0% {
+        top: -1px;
+        opacity: 0
+      }
+
+      8% {
+        opacity: 1
+      }
+
+      92% {
+        opacity: 1
+      }
+
+      100% {
+        top: calc(100% + 1px);
+        opacity: 0
+      }
+    }
+
+    .bkt,
+    .bkr,
+    .bkb,
+    .bkl {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      z-index: 6
+    }
+
+    .bkt::before,
+    .bkt::after,
+    .bkr::before,
+    .bkr::after,
+    .bkb::before,
+    .bkb::after,
+    .bkl::before,
+    .bkl::after {
+      content: '';
+      position: absolute;
+      background: rgba(79, 125, 245, 0.4)
+    }
+
+    .bkt {
+      top: 5px;
+      left: 5px
+    }
+
+    .bkt::before {
+      width: 14px;
+      height: 1px
+    }
+
+    .bkt::after {
+      width: 1px;
+      height: 14px
+    }
+
+    .bkr {
+      top: 5px;
+      right: 5px
+    }
+
+    .bkr::before {
+      top: 0;
+      right: 0;
+      width: 14px;
+      height: 1px
+    }
+
+    .bkr::after {
+      top: 0;
+      right: 0;
+      width: 1px;
+      height: 14px
+    }
+
+    .bkb {
+      bottom: 5px;
+      left: 5px
+    }
+
+    .bkb::before {
+      bottom: 0;
+      left: 0;
+      width: 14px;
+      height: 1px
+    }
+
+    .bkb::after {
+      bottom: 0;
+      left: 0;
+      width: 1px;
+      height: 14px
+    }
+
+    .bkl {
+      bottom: 5px;
+      right: 5px
+    }
+
+    .bkl::before {
+      bottom: 0;
+      right: 0;
+      width: 14px;
+      height: 1px
+    }
+
+    .bkl::after {
+      bottom: 0;
+      right: 0;
+      width: 1px;
+      height: 14px
+    }
+
+    .fa {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      flex-shrink: 0
+    }
+
+    .fa svg {
+      width: 22px;
+      height: 22px;
+      opacity: 0.3
+    }
+
+    .fl {
+      font-size: 10px;
+      color: var(--g400);
+      margin-top: 6px;
+      text-align: center
+    }
+
+    /* RADAR */
+    .rw {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      flex-wrap: wrap
+    }
+
+    .rc {
+      width: 280px;
+      height: 280px;
+      flex-shrink: 0
+    }
+
+    .rc svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible
+    }
+
+    .ts {
+      text-align: center;
+      flex: 1;
+      min-width: 140px
+    }
+
+    .ts .lb {
+      font-size: 11px;
+      color: var(--g400);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-family: var(--en);
+      margin-bottom: 2px
+    }
+
+    .ts .nm {
+      font-family: var(--en);
+      font-size: 56px;
+      font-weight: 200;
+      color: var(--navy);
+      line-height: 1
+    }
+
+    .ts .nm small {
+      font-size: 18px;
+      color: var(--g400);
+      font-weight: 300;
+      margin-left: 2px
+    }
+
+    .ts .jd {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 4px 14px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(34, 197, 94, 0.06);
+      color: var(--green);
+      border: 1px solid rgba(34, 197, 94, 0.2)
+    }
+
+    .leg {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 12px;
+      justify-content: center
+    }
+
+    .li {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: var(--g500)
+    }
+
+    .ld {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%
+    }
+
+    /* SCORE BARS */
+    .sl2 {
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px
+    }
+
+    .sr {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .sr .sn {
+      width: 80px;
+      font-size: 12px;
+      color: var(--g500);
+      flex-shrink: 0;
+      text-align: right
+    }
+
+    .sr .bo {
+      flex: 1;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      overflow: hidden
+    }
+
+    .sr .bf {
+      height: 100%;
+      border-radius: 3px;
+      animation: bga 1s ease-out both
+    }
+
+    .bn {
+      background: linear-gradient(90deg, var(--navy), var(--blue))
+    }
+
+    .bgn {
+      background: linear-gradient(90deg, #16a34a, var(--green))
+    }
+
+    .ba {
+      background: linear-gradient(90deg, #d97706, var(--amber))
+    }
+
+    .brd {
+      background: linear-gradient(90deg, #b91c1c, var(--red))
+    }
+
+    @keyframes bga {
+      0% {
+        width: 0 !important
+      }
+    }
+
+    .sr .sv {
+      width: 36px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--g700);
+      font-family: var(--en);
+      text-align: right
+    }
+
+    /* IMAGE FRAME */
+    .imf {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--g100);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 4px 16px rgba(26, 35, 126, 0.06);
+      aspect-ratio: 3/4
+    }
+
+    .imf .ph {
+      width: 100%;
+      aspect-ratio: 3/4;
+      background: linear-gradient(135deg, var(--g100), var(--g200));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: var(--g400)
+    }
+
+    .imf img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 18%;
+      transform: scale(1.18);
+      transform-origin: center 28%;
+      display: block
+    }
+
+    .imf .so {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 5
+    }
+
+    .imf.an .go {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      pointer-events: none;
+      background-image: linear-gradient(rgba(79, 125, 245, 0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(79, 125, 245, 0.04) 1px, transparent 1px);
+      background-size: 20px 20px
+    }
+
+    @keyframes ddp {
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: .7
+      }
+
+      50% {
+        transform: scale(1.3);
+        opacity: 1
+      }
+    }
+
+    @keyframes ddr {
+      0% {
+        transform: scale(.8);
+        opacity: .5
+      }
+
+      100% {
+        transform: scale(2);
+        opacity: 0
+      }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg) }
+    }
+
+    /* single map display */
+    .ip3 {
+      display: grid;
+      grid-template-columns: 58%;
+      justify-content: center;
+      gap: 10px;
+      margin: 14px 0
+    }
+
+    .ipl {
+      font-size: 10px;
+      color: var(--g400);
+      text-align: center;
+      margin-top: 4px
+    }
+
+    /* ANALYSIS */
+    .ab {
+      padding: 20px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.4)
+    }
+
+    .ab:last-child {
+      border-bottom: none
+    }
+
+    .ah {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--g800);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px
+    }
+
+    .ah .n {
+      font-family: var(--en);
+      font-size: 11px;
+      color: var(--blue);
+      font-weight: 600;
+      background: rgba(79, 125, 245, 0.08);
+      padding: 2px 8px;
+      border-radius: 6px
+    }
+
+    .as2 {
+      font-size: 12px;
+      color: var(--g500);
+      margin-bottom: 12px;
+      line-height: 1.7
+    }
+
+    .asc {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 12px 0
+    }
+
+    .ms {
+      padding: 10px;
+      border-radius: 10px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.5)
+    }
+
+    .ms .ml {
+      font-size: 10px;
+      color: var(--g400);
+      margin-bottom: 2px
+    }
+
+    .ms .mv {
+      font-family: var(--en);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--g800)
+    }
+
+    .ms .mv small {
+      font-size: 10px;
+      color: var(--g400);
+      font-weight: 300
+    }
+
+    .ms .mb {
+      height: 3px;
+      border-radius: 2px;
+      background: var(--g200);
+      margin-top: 6px;
+      overflow: hidden
+    }
+
+    .ms .mf {
+      height: 100%;
+      border-radius: 2px;
+      animation: bga 1s ease-out both
+    }
+
+    .ad {
+      font-size: 13px;
+      color: var(--g600);
+      line-height: 1.85;
+      margin-top: 12px
+    }
+
+    .ad strong {
+      color: var(--g800)
+    }
+
+    /* TREATMENT */
+    .tc {
+      border-radius: 16px;
+      margin: 10px 0;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, .05);
+      transition: all .35s cubic-bezier(.16, 1, .3, 1)
+    }
+
+    .tc:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, .08)
+    }
+
+    .tc>.t {
+      border-radius: 16px;
+      background: rgba(255, 255, 255, .4)
+    }
+
+    .tc>.s {
+      border-radius: 16px;
+      box-shadow: inset 1.5px 1.5px 1px rgba(255, 255, 255, .55), inset -.5px -.5px 1px rgba(255, 255, 255, .3)
+    }
+
+    .tc>.e {
+      border-radius: 16px;
+      backdrop-filter: blur(4px)
+    }
+
+    .tc>.c {
+      padding: 16px 18px
+    }
+
+    .tc.rec {
+      border-left: 3px solid var(--blue)
+    }
+
+    .tc.not {
+      border-left: 3px solid var(--red)
+    }
+
+    .th {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+      gap: 6px
+    }
+
+    .th h4 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--g800)
+    }
+
+    .tb {
+      padding: 3px 12px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 600;
+      white-space: nowrap
+    }
+
+    .tb.r {
+      background: rgba(79, 125, 245, .08);
+      color: var(--blue);
+      border: 1px solid rgba(79, 125, 245, .15)
+    }
+
+    .tb.nt {
+      background: rgba(212, 66, 92, .05);
+      color: var(--red);
+      border: 1px solid rgba(212, 66, 92, .15)
+    }
+
+    .tp {
+      font-size: 13px;
+      color: var(--g600);
+      line-height: 1.8
+    }
+
+    .rl {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin: 8px 0
+    }
+
+    .rl .d {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      border: 1px solid var(--g300)
+    }
+
+    .rl .d.a {
+      background: var(--navy);
+      border-color: var(--navy)
+    }
+
+    .rlt {
+      font-size: 11px;
+      color: var(--g400);
+      margin-left: 6px
+    }
+
+    .ct {
+      display: inline-flex;
+      padding: 6px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--navy);
+      margin-bottom: 12px;
+      background: rgba(26, 35, 126, .04);
+      border: 1px solid rgba(26, 35, 126, .1)
+    }
+
+    .gf {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, .25);
+      border: 1px solid rgba(255, 255, 255, .5);
+      min-height: 200px;
+      margin: 14px 0
+    }
+
+    .gf .ph {
+      width: 100%;
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: var(--g400)
+    }
+
+    .gf .so {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 5
+    }
+
+    @media(max-width:600px) {
+      .page {
+        padding: 0 12px 60px
+      }
+
+      .rw {
+        flex-direction: column;
+        align-items: center
+      }
+
+      .rc {
+        width: 240px;
+        height: 240px
+      }
+
+      .gc>.c {
+        padding: 18px 14px
+      }
+
+      .ff {
+        flex-direction: column;
+        gap: 10px
+      }
+
+      .fa {
+        transform: rotate(90deg);
+        width: auto;
+        height: 24px
+      }
+
+      .fi {
+        max-width: 140px
+      }
+
+      .ip3 {
+        grid-template-columns: 70%;
+        gap: 8px
+      }
+
+      .pc>.c>div[style*="display:flex"] {
+        flex-direction: column !important
+      }
+
+      .pc>.c>div[style*="display:flex"]>div:first-child {
+        width: 100% !important;
+        height: auto !important;
+        aspect-ratio: 16/9 !important
+      }
+
+      .fi {
+        max-width: 100%
+      }
+
+      .ff {
+        gap: 16px
+      }
+
+      .fc .yr {
+        font-size: 10px
+      }
+
+      .fc .yr span {
+        font-size: 14px
+      }
+
+      .fl {
+        font-size: 9px
+      }
+    }
+
+    .imf.an {
+      background: #000
+    }
+
+    .imf.an .ph {
+      background: #000;
+      color: rgba(255, 255, 255, 0.4)
+    }
+
+    .imf.an img {
+      opacity: 0.95
+    }
+
+    .mt-wrap {
+      display: flex;
+      gap: 0;
+      border-bottom: 2px solid rgba(26, 35, 126, .08);
+      margin-bottom: 16px
+    }
+
+    .mt-btn {
+      flex: 1;
+      padding: 14px 6px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--g400);
+      cursor: pointer;
+      transition: all .3s;
+      position: relative;
+      font-family: var(--jp);
+      line-height: 1.4
+    }
+
+    .mt-btn.active {
+      color: var(--navy)
+    }
+
+    .mt-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 10%;
+      right: 10%;
+      height: 2.5px;
+      background: var(--navy);
+      border-radius: 2px
+    }
+
+    .mt-panel {
+      display: none
+    }
+
+    .mt-panel.active {
+      display: block
+    }
+
+    .rv {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity .7s cubic-bezier(.16, 1, .3, 1), transform .7s cubic-bezier(.16, 1, .3, 1)
+    }
+
+    .rv.v {
+      opacity: 1;
+      transform: translateY(0)
+    }
+
+    /* COSME RECOMMEND */
+    .cosme-tab-wrap {
+      display: flex;
+      gap: 0;
+      margin-bottom: 18px;
+      border-bottom: 2px solid rgba(26, 35, 126, .06)
+    }
+
+    .cosme-tab {
+      flex: 1;
+      padding: 12px 8px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--g400);
+      cursor: pointer;
+      transition: all .3s;
+      position: relative;
+      font-family: var(--jp)
+    }
+
+    .cosme-tab.active {
+      color: var(--navy)
+    }
+
+    .cosme-tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 15%;
+      right: 15%;
+      height: 2px;
+      background: var(--navy);
+      border-radius: 2px
+    }
+
+    .cosme-panel {
+      display: none
+    }
+
+    .cosme-panel.active {
+      display: block
+    }
+
+    .pc {
+      border-radius: 16px;
+      margin: 12px 0;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, .05);
+      transition: all .35s cubic-bezier(.16, 1, .3, 1);
+      border-left: 3px solid var(--blue)
+    }
+
+    .pc:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, .08)
+    }
+
+    .pc>.t {
+      border-radius: 16px;
+      background: rgba(255, 255, 255, .4)
+    }
+
+    .pc>.s {
+      border-radius: 16px;
+      box-shadow: inset 1.5px 1.5px 1px rgba(255, 255, 255, .55), inset -.5px -.5px 1px rgba(255, 255, 255, .3)
+    }
+
+    .pc>.e {
+      border-radius: 16px;
+      backdrop-filter: blur(4px)
+    }
+
+    .pc>.c {
+      padding: 16px 18px
+    }
+
+    .pc-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px
+    }
+
+    .pc-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--g800)
+    }
+
+    .pc-brand {
+      font-size: 11px;
+      color: var(--g400);
+      margin-bottom: 8px
+    }
+
+    .pc-stars {
+      display: flex;
+      gap: 2px;
+      margin-bottom: 10px
+    }
+
+    .pc-stars svg {
+      width: 14px;
+      height: 14px
+    }
+
+    .pc-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: 600;
+      margin-right: 4px;
+      margin-bottom: 6px
+    }
+
+    .pc-tag.ingredient {
+      background: rgba(0, 184, 212, .06);
+      color: #0097a7;
+      border: 1px solid rgba(0, 184, 212, .15)
+    }
+
+    .pc-tag.match {
+      background: rgba(79, 125, 245, .06);
+      color: var(--blue);
+      border: 1px solid rgba(79, 125, 245, .12)
+    }
+
+    .pc-reason {
+      font-size: 13px;
+      color: var(--g600);
+      line-height: 1.85;
+      margin: 10px 0
+    }
+
+    .pc-reason strong {
+      color: var(--navy)
+    }
+
+    .pc-score-ref {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--g500);
+      background: rgba(26, 35, 126, .03);
+      border: 1px solid rgba(26, 35, 126, .06);
+      margin-right: 4px
+    }
+
+    .pc-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--blue);
+      background: rgba(79, 125, 245, .06);
+      border: 1px solid rgba(79, 125, 245, .12);
+      text-decoration: none;
+      transition: all .25s;
+      cursor: pointer;
+      font-family: var(--jp);
+      margin-top: 8px
+    }
+
+    .pc-cta:hover {
+      background: rgba(79, 125, 245, .12);
+      transform: translateY(-1px)
+    }
+
+    .pc-price {
+      font-family: var(--en);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--g800);
+      margin-top: 6px
+    }
+
+    .pc-price small {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--g400)
+    }
+
+    ::-webkit-scrollbar {
+      width: 4px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(26, 35, 126, .08);
+      border-radius: 4px
+    }
+    /* Before/After Slider */
+    .ba-after, .ba-before {
+      position: absolute;
+      inset: 0;
+    }
+    .ba-after {
+      opacity: 0;
+      transition: opacity .05s linear;
+    }
+    .imf.ba-wrap {
+      cursor: default;
+    }
+    .ba-range-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 4px 2px;
+      width: 100%;
+    }
+    .ba-range-label {
+      font-size: 10px;
+      color: var(--g500);
+      white-space: nowrap;
+      font-family: var(--jp);
+      flex-shrink: 0;
+      letter-spacing: 0.03em;
+    }
+    .ba-range {
+      -webkit-appearance: none;
+      appearance: none;
+      flex: 1;
+      height: 4px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, #4f7df5 0%, #dde4ff 0%);
+      outline: none;
+      cursor: pointer;
+    }
+    .ba-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2.5px solid #4f7df5;
+      box-shadow: 0 1px 6px rgba(79,125,245,0.3);
+      cursor: pointer;
+    }
+    .ba-range::-moz-range-thumb {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2.5px solid #4f7df5;
+      box-shadow: 0 1px 6px rgba(79,125,245,0.3);
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <button onclick="window.location.href='aimy-app.html'" style="position:fixed;top:16px;left:16px;z-index:9999;width:40px;height:40px;border-radius:50%;border:none;background:rgba(255,255,255,0.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 2px 12px rgba(0,0,0,0.15);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#1a237e;">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <div class="bg">
+    <div class="bk bk1"></div>
+    <div class="bk bk2"></div>
+    <div class="bk bk3"></div>
+  </div>
+  <div class="page">
+
+    <div class="rh rv">
+      <h1>お悩みに基づく 肌診断レポート</h1>
+      <div class="sub" id="reportDate">2024年12月20日の肌データ</div>
+      <div class="dv"></div>
+    </div>
+
+    <!-- PATIENT -->
+    <div class="gc lg pat rv">
+      <div class="e"></div>
+      <div class="t"></div>
+      <div class="s"></div>
+      <div class="c" style="display:flex;align-items:center;gap:16px">
+        <div class="pat-photo"><img src="assets/face_current.png" alt="患者写真"
+            style="width:100%;height:100%;object-fit:cover"></div>
+        <div class="pat-info" id="patInfo"><strong>患者情報</strong><br>気になるお悩み：シミ・くすみ<br>ダウンタイム：短め希望<br>施術経験：初めて</div>
+      </div>
+    </div>
+
+    <!-- FUTURE -->
+    <div class="gc lg rv">
+      <div class="e"></div>
+      <div class="t"></div>
+      <div class="s"></div>
+      <div class="c">
+        <div class="st"><span class="ic"
+            style="background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.15)"><svg width="14" height="14"
+              viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="1.5">
+              <path
+                d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+            </svg></span>施術を行わなかった場合の将来予測</div>
+        <div class="ss">現在の肌状態が続いた場合のシミュレーション</div>
+        <div class="ff">
+          <div class="fc">
+            <div class="yr">CURRENT<span>現在</span></div>
+            <div class="fi"><img src="assets/face_current.png" alt="現在">
+              <div class="so">
+                <div class="sl"></div>
+              </div>
+              <div class="bkt"></div>
+              <div class="bkr"></div>
+              <div class="bkb"></div>
+              <div class="bkl"></div>
+            </div>
+            <div class="fl" id="ageLabel0">現在</div>
+          </div>
+          <div class="fa"><svg viewBox="0 0 24 24" fill="none" stroke="var(--g400)" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg></div>
+          <div class="fc">
+            <div class="yr">+10 YEARS<span>10年後</span></div>
+            <div class="fi" style="border-color:rgba(245,158,11,.3)"><img src="assets/face_10years.png" alt="10年後予測">
+              <div class="so">
+                <div class="sl" style="animation-delay:1s"></div>
+              </div>
+              <div class="bkt"></div>
+              <div class="bkr"></div>
+              <div class="bkb"></div>
+              <div class="bkl"></div>
+            </div>
+            <div class="fl" id="ageLabel10">+10年後</div>
+          </div>
+          <div class="fa"><svg viewBox="0 0 24 24" fill="none" stroke="var(--g400)" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg></div>
+          <div class="fc">
+            <div class="yr">+20 YEARS<span>20年後</span></div>
+            <div class="fi" style="border-color:rgba(212,66,92,.25)"><img src="assets/face_20years.png" alt="20年後予測">
+              <div class="so">
+                <div class="sl" style="animation-delay:2s"></div>
+              </div>
+              <div class="bkt"></div>
+              <div class="bkr"></div>
+              <div class="bkb"></div>
+              <div class="bkl"></div>
+            </div>
+            <div class="fl" id="ageLabel20">+20年後</div>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--g500);line-height:1.8;margin-top:16px;text-align:center">※
+          現在の肌データに基づく予測であり、実際の変化は生活習慣やケア内容により異なります。</p>
+      </div>
+    </div>
+
+    <!-- RADAR -->
+    <div class="gc lg rv">
+      <div class="e"></div>
+      <div class="t"></div>
+      <div class="s"></div>
+      <div class="c">
+        <div class="st"><span class="ic"
+            style="background:rgba(26,35,126,.06);border:1px solid rgba(26,35,126,.12)"><svg width="14" height="14"
+              viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="1.5">
+              <path d="M12 2l2.4 7.4H22l-6 4.4 2.3 7.2L12 16.6 5.7 21l2.3-7.2-6-4.4h7.6z" />
+            </svg></span>肌の全体スコア</div>
+        <div class="ss">10の指標に基づく総合評価</div>
+        <div class="rw">
+          <div class="rc"><canvas id="radarCanvas" width="560" height="560" style="width:100%;height:100%"></canvas>
+          </div>
+          <div class="ts">
+            <div class="lb">Total Score</div>
+            <div class="nm" id="totalScoreNum">72<small>/100</small></div>
+            <div class="jd" id="totalScoreJudge">良好</div>
+          </div>
+        </div>
+        <div class="leg">
+          <div class="li">
+            <div class="ld" style="background:var(--blue)"></div>あなたのスコア
+          </div>
+          <div class="li">
+            <div class="ld" style="background:var(--amber)"></div>同年代の平均
+          </div>
+        </div>
+        <div class="sl2" id="scL"></div>
+      </div>
+    </div>
+
+    <!-- ANALYSIS SUMMARY -->
+    <div class="gc lg rv">
+      <div class="e"></div>
+      <div class="t"></div>
+      <div class="s"></div>
+      <div class="c">
+        <div class="st"><span class="ic"
+            style="background:rgba(79,125,245,.08);border:1px solid rgba(79,125,245,.15)"><svg width="14" height="14"
+              viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="1.5">
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
+            </svg></span>お悩みに基づく分析</div>
+        <div class="ss" id="concernSubtitle">シミ・くすみに関連する詳細な肌分析結果</div>
+        <div class="ct" id="concernTag">気になるお悩み：シミ・くすみ</div>
+        <p style="font-size:13px;color:var(--g600);line-height:1.85;margin-bottom:12px">
+          お伺いしたお悩みに基づき、肌の状態を多角的に分析しました。以下の結果をもとに、現在の肌コンディションに合った最適な施術プランをご提案いたします。</p>
+        <div
+          style="border-radius:14px;overflow:hidden;background:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.5);padding:20px 16px;margin:14px 0">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><span
+              style="font-size:12px;font-weight:600;color:var(--g700)">お悩み関連スコア</span><span
+              style="font-size:10px;color:var(--g400)">低 ← → 高（良好）</span></div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;align-items:center;gap:10px"><span
+                style="width:64px;font-size:11px;color:var(--g500);text-align:right;flex-shrink:0">シミ</span>
+              <div
+                style="flex:1;height:20px;border-radius:10px;background:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.5);overflow:hidden;position:relative">
+                <div id="bar-fill-shimi"
+                  style="width:82%;height:100%;border-radius:10px;background:linear-gradient(90deg,#16a34a,#22c55e);transition:width 1s">
+                </div>
+              </div><span id="bar-val-shimi"
+                style="width:28px;font-size:12px;font-weight:700;color:#22c55e;font-family:var(--en)">82</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px"><span
+                style="width:64px;font-size:11px;color:var(--g500);text-align:right;flex-shrink:0">隠れジミ</span>
+              <div
+                style="flex:1;height:20px;border-radius:10px;background:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.5);overflow:hidden;position:relative">
+                <div id="bar-fill-kakureshimi"
+                  style="width:68%;height:100%;border-radius:10px;background:linear-gradient(90deg,#d97706,#f59e0b);transition:width 1s">
+                </div>
+              </div><span id="bar-val-kakureshimi"
+                style="width:28px;font-size:12px;font-weight:700;color:#f59e0b;font-family:var(--en)">68</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px"><span
+                style="width:64px;font-size:11px;color:var(--g500);text-align:right;flex-shrink:0">くすみ</span>
+              <div
+                style="flex:1;height:20px;border-radius:10px;background:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.5);overflow:hidden;position:relative">
+                <div id="bar-fill-kusumi"
+                  style="width:65%;height:100%;border-radius:10px;background:linear-gradient(90deg,#d97706,#f59e0b);transition:width 1s">
+                </div>
+              </div><span id="bar-val-kusumi"
+                style="width:28px;font-size:12px;font-weight:700;color:#f59e0b;font-family:var(--en)">65</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px"><span
+                style="width:64px;font-size:11px;color:var(--g500);text-align:right;flex-shrink:0">赤み</span>
+              <div
+                style="flex:1;height:20px;border-radius:10px;background:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.5);overflow:hidden;position:relative">
+                <div id="bar-fill-akami"
+                  style="width:58%;height:100%;border-radius:10px;background:linear-gradient(90deg,#b91c1c,#d4425c);transition:width 1s">
+                </div>
+              </div><span id="bar-val-akami"
+                style="width:28px;font-size:12px;font-weight:700;color:#d4425c;font-family:var(--en)">58</span>
+            </div>
+          </div>
+          <div style="margin-top:16px;padding-top:12px;border-top:1px solid rgba(255,255,255,.4)">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span
+                style="font-size:12px;font-weight:600;color:var(--g700)">肌基礎力スコア</span></div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;align-items:center;gap:10px"><span
+                  style="width:64px;font-size:11px;color:var(--g500);text-align:right;flex-shrink:0">キメ</span>
+                <div
+                  style="flex:1;height:20px;border-radius:10px;background:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.5);overflow:hidden;position:relative">
+                  <div id="bar-fill-kime"
+                    style="width:79%;height:100%;border-radius:10px;background:linear-gradient(90deg,#16a34a,#22c55e);transition:width 1s">
+                  </div>
+                </div><span id="bar-val-kime"
+                  style="width:28px;font-size:12px;font-weight:700;color:#22c55e;font-family:var(--en)">79</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px"><span
+                  style="width:64px;font-size:11px;color:var(--g500);text-align:right;flex-shrink:0">毛穴</span>
+                <div
+                  style="flex:1;height:20px;border-radius:10px;background:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.5);overflow:hidden;position:relative">
+                  <div id="bar-fill-keana"
+                    style="width:74%;height:100%;border-radius:10px;background:linear-gradient(90deg,var(--navy),var(--blue));transition:width 1s">
+                  </div>
+                </div><span id="bar-val-keana"
+                  style="width:28px;font-size:12px;font-weight:700;color:var(--blue);font-family:var(--en)">74</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px"><span
+                  style="width:64px;font-size:11px;color:var(--g500);text-align:right;flex-shrink:0">シワ</span>
+                <div
+                  style="flex:1;height:20px;border-radius:10px;background:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.5);overflow:hidden;position:relative">
+                  <div id="bar-fill-shiwa"
+                    style="width:72%;height:100%;border-radius:10px;background:linear-gradient(90deg,var(--navy),var(--blue));transition:width 1s">
+                  </div>
+                </div><span id="bar-val-shiwa"
+                  style="width:28px;font-size:12px;font-weight:700;color:var(--blue);font-family:var(--en)">72</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px"><span
+                  style="width:64px;font-size:11px;color:var(--g500);text-align:right;flex-shrink:0">肌年齢</span>
+                <div
+                  style="flex:1;height:20px;border-radius:10px;background:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.5);overflow:hidden;position:relative">
+                  <div id="bar-fill-hadanen"
+                    style="width:69%;height:100%;border-radius:10px;background:linear-gradient(90deg,#d97706,#f59e0b);transition:width 1s">
+                  </div>
+                </div><span id="bar-val-hadanen"
+                  style="width:28px;font-size:12px;font-weight:700;color:#f59e0b;font-family:var(--en)">69</span>
+              </div>
+            </div>
+          </div>
+          <div
+            style="display:flex;gap:12px;margin-top:16px;padding-top:12px;border-top:1px solid rgba(255,255,255,.4);justify-content:center">
+            <div style="display:flex;align-items:center;gap:4px">
+              <div style="width:10px;height:10px;border-radius:3px;background:#22c55e"></div><span
+                style="font-size:10px;color:var(--g400)">良好 (75+)</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:4px">
+              <div style="width:10px;height:10px;border-radius:3px;background:var(--blue)"></div><span
+                style="font-size:10px;color:var(--g400)">普通 (70-74)</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:4px">
+              <div style="width:10px;height:10px;border-radius:3px;background:#f59e0b"></div><span
+                style="font-size:10px;color:var(--g400)">注意 (60-69)</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:4px">
+              <div style="width:10px;height:10px;border-radius:3px;background:#d4425c"></div><span
+                style="font-size:10px;color:var(--g400)">要改善 (-59)</span>
+            </div>
+          </div>
+        </div>
+        <p style="font-size:13px;color:var(--g600);line-height:1.85" id="analysisText">
+          全体的にバランスの取れた肌状態ですが、シミ・くすみのスコアが他の項目に比べてやや低く、紫外線ダメージの蓄積が考えられます。ターンオーバーの低下により、メラニンの排出が追いついていない可能性があります。</p>
+      </div>
+    </div>
+
+    <!-- DETAIL BY CONCERN -->
+    <div class="gc lg rv">
+      <div class="e"></div>
+      <div class="t"></div>
+      <div class="s"></div>
+      <div class="c">
+        <div class="st"><span class="ic"
+            style="background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.15)"><svg width="14" height="14"
+              viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.5">
+              <path d="M12 2a10 10 0 100 20 10 10 0 000-20z" />
+              <path d="M12 6v6l4 2" />
+            </svg></span>項目別の詳細分析</div>
+        <div class="ss">画像解析による項目ごとの肌分析結果</div>
+
+        <!-- マップの見方 -->
+        <div
+          style="padding:16px;border-radius:14px;background:rgba(0,0,0,.03);border:1px solid rgba(255,255,255,.4);margin-bottom:20px">
+          <div style="font-size:13px;font-weight:700;color:var(--g800);margin-bottom:12px">📊 解析マップの見方</div>
+          <div style="font-size:11px;color:var(--g500);line-height:1.8">
+            <strong style="color:var(--g700)">スコアの目安：</strong>数値が低いほど症状が軽く良好な状態です。各エリアの色分けで、緑＝良好 → 黄＝注意 → 赤＝要ケア
+            を示しています。解析マップでは各項目の検出結果を顔画像上にオーバーレイし、ケアの優先部位を視覚的に確認できます。
+          </div>
+        </div>
+
+        <!-- 01 シミ -->
+        <div class="ab">
+          <div class="ah"><span class="n">01</span>シミ</div>
+          <div class="as2">シミ・隠れジミの分布パターンと深度を解析</div>
+          <div class="ip3">
+            <div>
+              <div class="imf an ba-wrap" id="slider-shimi">
+                <div class="ba-before"><img src="assets/face_current.png" alt="元画像"></div>
+                <div class="ba-after"><img src="assets/map_shimi.png" alt="シミ解析マップ"></div>
+                <div class="go"></div>
+                <div class="so"><div class="sl"></div></div>
+                <div class="bkt"></div>
+                <div class="bkr"></div>
+                <div class="bkb"></div>
+                <div class="bkl"></div>
+              </div>
+              <div class="ba-range-row">
+                <span class="ba-range-label">元画像</span>
+                <input type="range" class="ba-range" id="range-shimi" min="0" max="100" value="0">
+                <span class="ba-range-label">解析マップ</span>
+              </div>
+            </div>
+          </div>
+          <div class="asc" id="asc-shimi">
+            <div class="ms">
+              <div class="ml">シミ濃度</div>
+              <div class="mv">45<small>/100</small></div>
+              <div class="mb">
+                <div class="mf ba" style="width:45%"></div>
+              </div>
+            </div>
+            <div class="ms">
+              <div class="ml">分布範囲</div>
+              <div class="mv">38<small>/100</small></div>
+              <div class="mb">
+                <div class="mf brd" style="width:38%"></div>
+              </div>
+            </div>
+            <div class="ms">
+              <div class="ml">色ムラ</div>
+              <div class="mv">52<small>/100</small></div>
+              <div class="mb">
+                <div class="mf ba" style="width:52%"></div>
+              </div>
+            </div>
+            <div class="ms">
+              <div class="ml">くすみ度</div>
+              <div class="mv">48<small>/100</small></div>
+              <div class="mb">
+                <div class="mf ba" style="width:48%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="ad" id="ad-shimi">
+            <strong>分析結果：</strong><span id="ad-shimi-text">頬骨の上部を中心に、紫外線性のシミが散在しています。目の下にはやや広範囲にくすみが見られ、メラニンの蓄積が確認されます。左右差はほぼなく、対称的な分布パターンです。シミの深さは比較的浅く、表皮レベルのものが中心のため、光治療やマイルドなピーリングでの改善が見込めます。</span>
+          </div>
+        </div>
+
+        <!-- 02 シワ -->
+        <div class="ab">
+          <div class="ah"><span class="n">02</span>シワ</div>
+          <div class="as2">シワの深度・分布・種類を解析</div>
+          <div class="ip3">
+            <div>
+              <div class="imf an"><img src="assets/map_shiwa.png" alt="シワ解析マップ">
+                <div class="go"></div>
+                <div class="so">
+                  <div class="sl"></div>
+                </div>
+                <div class="bkt"></div>
+                <div class="bkr"></div>
+                <div class="bkb"></div>
+                <div class="bkl"></div>
+                <div class="dd" style="top:22%;left:30%"></div>
+                <div class="dd" style="top:22%;left:70%"></div>
+                <div class="dd" style="top:55%;left:50%"></div>
+              </div>
+              <div class="ipl">解析マップ</div>
+            </div>
+          </div>
+          <div class="asc" id="asc-shiwa">
+            <div class="ms">
+              <div class="ml">シワ深度</div>
+              <div class="mv">72<small>/100</small></div>
+              <div class="mb">
+                <div class="mf bn" style="width:72%"></div>
+              </div>
+            </div>
+            <div class="ms">
+              <div class="ml">額のシワ</div>
+              <div class="mv">65<small>/100</small></div>
+              <div class="mb">
+                <div class="mf bn" style="width:65%"></div>
+              </div>
+            </div>
+            <div class="ms">
+              <div class="ml">目尻のシワ</div>
+              <div class="mv">58<small>/100</small></div>
+              <div class="mb">
+                <div class="mf ba" style="width:58%"></div>
+              </div>
+            </div>
+            <div class="ms">
+              <div class="ml">ほうれい線</div>
+              <div class="mv">60<small>/100</small></div>
+              <div class="mb">
+                <div class="mf ba" style="width:60%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="ad" id="ad-shiwa">
+            <strong>分析結果：</strong><span id="ad-shiwa-text">額に軽度の表情ジワが見られます。目尻の笑いジワは乾燥による小ジワ傾向がありますが、深いシワへの進行は見られません。ほうれい線は年齢相応の状態です。保湿ケアの強化とターンオーバー促進で改善が期待できます。</span>
+          </div>
+        </div>
+
+        <!-- 03 テクスチャー -->
+        <div class="ab">
+          <div class="ah"><span class="n">03</span>テクスチャー</div>
+          <div class="as2">肌のキメ・質感・ハリの状態を解析</div>
+          <div class="ip3">
+            <div>
+              <div class="imf an"><img src="assets/map_texture.png" alt="テクスチャー解析マップ">
+                <div class="go"></div>
+                <div class="so">
+                  <div class="sl"></div>
+                </div>
+                <div class="bkt"></div>
+                <div class="bkr"></div>
+                <div class="bkb"></div>
+                <div class="bkl"></div>
+                <div class="dd" style="top:35%;left:40%"></div>
+                <div class="dd" style="top:50%;left:55%"></div>
+              </div>
+              <div class="ipl">解析マップ</div>
+            </div>
+          </div>
+          <div class="asc" id="asc-texture">
+            <div class="ms">
+              <div class="ml">キメ細かさ</div>
+              <div class="mv">79<small>/100</small></div>
+              <div class="mb">
+                <div class="mf bgn" style="width:79%"></div>
+              </div>
+            </div>
+            <div class="ms">
+              <div class="ml">ハリ・弾力</div>
+              <div class="mv">68<small>/100</small></div>
+              <div class="mb">
+                <div class="mf bn" style="width:68%"></div>
+              </div>
+            </div>
+            <div class="ms">
+              <div class="ml">なめらかさ</div>
+              <div class="mv">72<small>/100</small></div>
+              <div class="mb">
+                <div class="mf bn" style="width:72%"></div>
+              </div>
+            </div>
+            <div class="ms">
+              <div class="ml">ツヤ</div>
+              <div class="mv">65<small>/100</small></div>
+              <div class="mb">
+                <div class="mf bn" style="width:65%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="ad" id="ad-texture">
+            <strong>分析結果：</strong><span id="ad-texture-text">キメの細かさは良好で、肌の基礎コンディションは安定しています。ハリ・弾力はやや低下傾向にあり、コラーゲンの産生促進が効果的です。保湿ケアの見直しで質感の改善が期待できます。</span>
+          </div>
+        </div>
+
+        <!-- 04 毛穴 -->
+        <div class="ab">
+          <div class="ah"><span class="n">04</span>毛穴</div>
+          <div class="as2">毛穴の開き・黒ずみ・詰まりの状態を解析</div>
+          <div class="ip3">
+            <div>
+              <div class="imf an ba-wrap" id="slider-keana">
+                <div class="ba-before"><img src="assets/face_current.png" alt="元画像"></div>
+                <div class="ba-after"><img src="assets/map_keana.png" alt="毛穴解析マップ"></div>
+                <div class="go"></div>
+                <div class="so"><div class="sl"></div></div>
+                <div class="bkt"></div>
+                <div class="bkr"></div>
+                <div class="bkb"></div>
+                <div class="bkl"></div>
+              </div>
+              <div class="ba-range-row">
+                <span class="ba-range-label">元画像</span>
+                <input type="range" class="ba-range" id="range-keana" min="0" max="100" value="0">
+                <span class="ba-range-label">解析マップ</span>
+              </div>
+            </div>
+          </div>
+          <div class="asc" id="asc-keana">
+            <div class="ms">
+              <div class="ml">毛穴の開き</div>
+              <div class="mv">74<small>/100</small></div>
+              <div class="mb">
+                <div class="mf bn" style="width:74%"></div>
+              </div>
+            </div>
+            <div class="ms">
+              <div class="ml">黒ずみ</div>
+              <div class="mv">68<small>/100</small></div>
+              <div class="mb">
+                <div class="mf bn" style="width:68%"></div>
+              </div>
+            </div>
+            <div class="ms">
+              <div class="ml">詰まり</div>
+              <div class="mv">72<small>/100</small></div>
+              <div class="mb">
+                <div class="mf bn" style="width:72%"></div>
+              </div>
+            </div>
+            <div class="ms">
+              <div class="ml">たるみ毛穴</div>
+              <div class="mv">60<small>/100</small></div>
+              <div class="mb">
+                <div class="mf ba" style="width:60%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="ad" id="ad-keana">
+            <strong>分析結果：</strong><span id="ad-keana-text">鼻周りと頬の毛穴にやや開きが見られますが、年齢相応の範囲内です。たるみ毛穴の傾向が頬に出始めているため、コラーゲン生成を促すケアや引き締め系の施術が効果的です。</span></div>
+        </div>
+
+        <!-- 05 赤み -->
+        <div class="ab">
+          <div class="ah"><span class="n">05</span>赤み</div>
+          <div class="as2">肌の赤み・炎症・血管拡張の状態を解析</div>
+          <div class="ip3">
+            <div>
+              <div class="imf an"><img src="assets/map_akami.png" alt="赤み解析マップ">
+                <div class="go"></div>
+                <div class="so">
+                  <div class="sl"></div>
+                </div>
+                <div class="bkt"></div>
+                <div class="bkr"></div>
+                <div class="bkb"></div>
+                <div class="bkl"></div>
+              </div>
+              <div class="ipl">解析マップ</div>
+            </div>
+          </div>
+          <div class="asc" id="asc-akami">
+            <div class="ms">
+              <div class="ml">赤み強度</div>
+              <div class="mv">58<small>/100</small></div>
+              <div class="mb">
+                <div class="mf ba" style="width:58%"></div>
+              </div>
+            </div>
+            <div class="ms">
+              <div class="ml">鼻周り</div>
+              <div class="mv">42<small>/100</small></div>
+              <div class="mb">
+                <div class="mf brd" style="width:42%"></div>
+              </div>
+            </div>
+            <div class="ms">
+              <div class="ml">頬の赤み</div>
+              <div class="mv">50<small>/100</small></div>
+              <div class="mb">
+                <div class="mf ba" style="width:50%"></div>
+              </div>
+            </div>
+            <div class="ms">
+              <div class="ml">炎症リスク</div>
+              <div class="mv">65<small>/100</small></div>
+              <div class="mb">
+                <div class="mf bn" style="width:65%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="ad" id="ad-akami">
+            <strong>分析結果：</strong><span id="ad-akami-text">鼻周りと頬に赤みが集中しています。特に鼻のTゾーンに血管拡張の傾向が見られ、皮脂分泌の活発さと関連している可能性があります。頬の赤みは軽度の敏感肌傾向を示唆しており、刺激の強い施術は避けるべきです。保湿・バリア機能の強化を優先し、赤みを抑えるケアを取り入れることをおすすめします。</span>
+          </div>
+        </div>
+
+        <!-- 06 肝斑 -->
+        <div class="ab">
+          <div class="ah"><span class="n">06</span>肝斑</div>
+          <div class="as2">肝斑・くすみの分布と濃度を解析</div>
+          <div class="ip3">
+            <div>
+              <div class="imf an"><img src="assets/map_kanpan.png" alt="肝斑解析マップ">
+                <div class="go"></div>
+                <div class="so"><div class="sl"></div></div>
+                <div class="bkt"></div>
+                <div class="bkr"></div>
+                <div class="bkb"></div>
+                <div class="bkl"></div>
+              </div>
+              <div class="ipl">解析マップ</div>
+            </div>
+          </div>
+          <div class="asc" id="asc-kanpan">
+            <div class="ms">
+              <div class="ml">肝斑濃度</div>
+              <div class="mv">--<small>/100</small></div>
+              <div class="mb"><div class="mf ba" style="width:0%"></div></div>
+            </div>
+            <div class="ms">
+              <div class="ml">分布範囲</div>
+              <div class="mv">--<small>/100</small></div>
+              <div class="mb"><div class="mf bn" style="width:0%"></div></div>
+            </div>
+          </div>
+          <div class="ad" id="ad-kanpan">
+            <strong>分析結果：</strong>解析データが取得されていません。解析を実行すると結果が表示されます。
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══ 施術＆コスメ タブ ═══ -->
+    <div class="gc lg rv">
+      <div class="e"></div>
+      <div class="t"></div>
+      <div class="s"></div>
+      <div class="c">
+        <div class="st"><span class="ic"
+            style="background:rgba(79,125,245,.08);border:1px solid rgba(79,125,245,.15)"><svg width="14" height="14"
+              viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="1.5">
+              <path d="M5 13l4 4L19 7" />
+            </svg></span>おすすめドクターズコスメ</div>
+        <div class="ss">AIがあなたの肌分析からパーソナライズドコスメをご提案</div>
+
+        <div id="cosmeList" style="margin-top:16px">
+          <div id="cosmeLoading" style="text-align:center;padding:40px 16px">
+            <div style="display:inline-flex;align-items:center;gap:10px;background:rgba(79,125,245,.06);border:1px solid rgba(79,125,245,.15);border-radius:20px;padding:12px 24px;font-size:13px;color:var(--navy);font-weight:500">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite;flex-shrink:0"><circle cx="12" cy="12" r="10" opacity=".25"/><path d="M12 2a10 10 0 0110 10"/></svg>
+              AIがあなたの肌分析からコスメを選定中...
+            </div>
+          </div>
+        </div>
+        <p style="font-size:11px;color:var(--g400);line-height:1.8;margin-top:14px;text-align:center">※ 価格・在庫は変動する場合があります。肌に合わない場合は使用を中止してください。</p>
+
+      </div>
+    </div>
+
+    <div style="text-align:center;padding:30px 0;font-size:11px;color:var(--g400)">※
+      本レポートは分析結果であり、医師の診断に代わるものではありません。<br>施術の最終的な判断は、担当医師とのカウンセリングにて行ってください。</div>
+  </div>
+
+  <svg style="display:none">
+    <filter id="gd" x="0%" y="0%" width="100%" height="100%" filterUnits="objectBoundingBox">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="1" seed="5" result="turb" />
+      <feComponentTransfer in="turb" result="mapped">
+        <feFuncR type="gamma" amplitude="1" exponent="10" offset="0.5" />
+        <feFuncG type="gamma" amplitude="0" exponent="1" offset="0" />
+        <feFuncB type="gamma" amplitude="0" exponent="1" offset="0.5" />
+      </feComponentTransfer>
+      <feGaussianBlur in="turb" stdDeviation="3" result="soft" />
+      <feSpecularLighting in="soft" surfaceScale="4" specularConstant="0.8" specularExponent="120"
+        lighting-color="white" result="spec">
+        <fePointLight x="-200" y="-200" z="300" />
+      </feSpecularLighting>
+      <feComposite in="spec" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="lit" />
+      <feDisplacementMap in="SourceGraphic" in2="soft" scale="120" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+  </svg>
+
+  <script>
+    // RADAR with Canvas (reliable rendering)
+    window.drawRadar = function (sc) {
+      var canvas = document.getElementById('radarCanvas');
+      var ctx = canvas.getContext('2d');
+      var W = 560, H = 560, cx = W / 2, cy = H / 2, R = 180, n = sc.length;
+      ctx.clearRect(0, 0, W, H);
+
+      function angle(i) { return (Math.PI * 2 / n) * i - Math.PI / 2; }
+      function px(i, r) { return cx + r * Math.cos(angle(i)); }
+      function py(i, r) { return cy + r * Math.sin(angle(i)); }
+
+      // Grid
+      ctx.strokeStyle = '#d1d5de'; ctx.lineWidth = 1;
+      [0.25, 0.5, 0.75, 1].forEach(function (lv) {
+        ctx.beginPath();
+        for (var i = 0; i <= n; i++) { var ii = i % n; if (i === 0) ctx.moveTo(px(ii, R * lv), py(ii, R * lv)); else ctx.lineTo(px(ii, R * lv), py(ii, R * lv)); }
+        ctx.closePath(); ctx.stroke();
+      });
+
+      // Axes
+      for (var i = 0; i < n; i++) { ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(px(i, R), py(i, R)); ctx.stroke(); }
+
+      // Average polygon
+      ctx.setLineDash([6, 4]); ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.6;
+      ctx.beginPath();
+      for (var i = 0; i <= n; i++) { var ii = i % n; var r = R * (sc[ii].a / 100); if (i === 0) ctx.moveTo(px(ii, r), py(ii, r)); else ctx.lineTo(px(ii, r), py(ii, r)); }
+      ctx.closePath(); ctx.stroke();
+      ctx.setLineDash([]); ctx.globalAlpha = 1;
+
+      // Data polygon
+      ctx.fillStyle = 'rgba(79,125,245,0.12)'; ctx.strokeStyle = '#4f7df5'; ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (var i = 0; i <= n; i++) { var ii = i % n; var r = R * (sc[ii].v / 100); if (i === 0) ctx.moveTo(px(ii, r), py(ii, r)); else ctx.lineTo(px(ii, r), py(ii, r)); }
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+
+      // Dots + Labels
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      for (var i = 0; i < n; i++) {
+        var r = R * (sc[i].v / 100);
+        ctx.fillStyle = sc[i].c; ctx.beginPath(); ctx.arc(px(i, r), py(i, r), 6, 0, Math.PI * 2); ctx.fill();
+        var ar = R * (sc[i].a / 100);
+        ctx.fillStyle = '#f59e0b'; ctx.globalAlpha = 0.6; ctx.beginPath(); ctx.arc(px(i, ar), py(i, ar), 5, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1;
+        ctx.fillStyle = sc[i].c; ctx.font = 'bold 22px Outfit';
+        ctx.fillText(sc[i].v, px(i, R + 30), py(i, R + 30));
+        ctx.fillStyle = '#6b7280'; ctx.font = '500 18px "Noto Sans JP"';
+        ctx.fillText(sc[i].l, px(i, R + 55), py(i, R + 55));
+      }
+
+      // Score bars
+      var ls = document.getElementById('scL');
+      ls.innerHTML = '';
+      var bc = { シミ: 'bgn', 隠れジミ: 'ba', 毛穴: 'bn', キメ: 'bgn', くすみ: 'ba', 赤み: 'brd', シワ: 'bn', フェイスライン: 'bgn', 左右差: 'bn', 肌年齢: 'ba' };
+      sc.forEach(function (s, i) {
+        var row = document.createElement('div'); row.className = 'sr';
+        row.innerHTML = '<span class="sn">' + s.l + '</span><div class="bo"><div class="bf ' + (bc[s.l] || 'bn') + '" style="width:' + s.v + '%;animation-delay:' + i * 0.08 + 's"></div></div><span class="sv">' + s.v + '</span>';
+        ls.appendChild(row);
+      });
+    };
+
+    // Default draw on page load
+    window.drawRadar([
+      { l: 'シミ', v: 82, a: 70, c: '#22c55e' },
+      { l: '隠れジミ', v: 68, a: 65, c: '#f59e0b' },
+      { l: '毛穴', v: 74, a: 72, c: '#4f7df5' },
+      { l: 'キメ', v: 79, a: 70, c: '#22c55e' },
+      { l: 'くすみ', v: 65, a: 68, c: '#f59e0b' },
+      { l: '赤み', v: 58, a: 62, c: '#d4425c' },
+      { l: 'シワ', v: 72, a: 70, c: '#4f7df5' },
+      { l: 'フェイスライン', v: 76, a: 68, c: '#22c55e' },
+      { l: '左右差', v: 70, a: 72, c: '#4f7df5' },
+      { l: '肌年齢', v: 69, a: 65, c: '#f59e0b' }
+    ]);
+
+    // ═══ CHAT DATA INJECTION ═══
+    (function () {
+      var raw = localStorage.getItem('aimyChatData');
+      if (!raw) return;
+      var d; try { d = JSON.parse(raw); } catch (e) { return; }
+
+      // ダウンタイム表示
+      var dtMap = { 'なるべく短く': '短め希望', '1週間程度なら可': '1週間以内', '特にこだわらない': '特になし' };
+      var dtLabel = dtMap[d.downtime] || d.downtime;
+
+      // 施術経験表示
+      var expMap = { '初めて': '初めて', '1〜2回ある': '経験あり（1〜2回）', '定期的に通っている': '定期通院中' };
+      var expLabel = expMap[d.experience] || d.experience;
+
+      // 日付
+      var dateEl = document.getElementById('reportDate');
+      if (dateEl && d.date) dateEl.textContent = d.date + 'の肌データ';
+
+      // 患者情報
+      var patEl = document.getElementById('patInfo');
+      if (patEl) patEl.innerHTML = '<strong>患者情報</strong><br>気になるお悩み：' + (d.concern || '−') + '<br>ダウンタイム：' + dtLabel + '<br>施術経験：' + expLabel;
+
+      // 年齢ラベル（静的表示）
+      var al0 = document.getElementById('ageLabel0'); if (al0) al0.textContent = '現在';
+      var al10 = document.getElementById('ageLabel10'); if (al10) al10.textContent = '+10年後';
+      var al20 = document.getElementById('ageLabel20'); if (al20) al20.textContent = '+20年後';
+
+      // お悩みラベル
+      var csEl = document.getElementById('concernSubtitle');
+      if (csEl && d.concern) csEl.textContent = d.concern + 'に関連する詳細な肌分析結果';
+      var ctEl = document.getElementById('concernTag');
+      if (ctEl && d.concern) ctEl.textContent = '気になるお悩み：' + d.concern;
+
+      // 分析テキスト
+      var analysisMap = {
+        'シミ・くすみ': '全体的にバランスの取れた肌状態ですが、シミ・くすみのスコアが他の項目に比べてやや低く、紫外線ダメージの蓄積が考えられます。ターンオーバーの低下により、メラニンの排出が追いついていない可能性があります。',
+        'シワ・たるみ': 'フェイスラインとシワのスコアに改善の余地があります。コラーゲン・エラスチンの減少が主な要因と考えられ、特に目元・口元のシワが目立ちやすい状態です。早めのケアで進行を抑えることが可能です。',
+        '毛穴・テクスチャー': '毛穴スコアとキメのスコアに課題が見られます。皮脂分泌の乱れや角質肥厚が毛穴の目立ちを引き起こしている可能性があります。テクスチャーを整えることで肌全体の透明感向上が期待できます。',
+        '赤み・敏感肌': '赤みスコアが他の指標に比べて低く、炎症傾向が見られます。バリア機能の低下による外部刺激への過剰反応が考えられます。まず肌のバリア機能を整えることが改善への第一歩です。'
+      };
+      var atEl = document.getElementById('analysisText');
+      if (atEl && d.concern && analysisMap[d.concern]) atEl.textContent = analysisMap[d.concern];
+
+      // 施術レコメンド
+      var treatmentData = {
+        'シミ・くすみ': {
+          rec: [
+            { name: '光治療（IPL / フォトフェイシャル）', stars: 5, text: '広範囲のシミ・くすみに対して最も効果的。ダウンタイムも短く、ライフスタイルとの相性が非常に良いです。' },
+            { name: 'レーザートーニング', stars: 4, text: '肝斑を含むシミの改善に効果的。低出力で肌への負担を抑えつつメラニンを分解します。' },
+            { name: 'ケミカルピーリング（マイルド）', stars: 4, text: 'ターンオーバーを促進し、メラニンの排出を助けます。キメの改善・くすみ解消に効果的です。' },
+            { name: 'ビタミンC導入（イオン導入）', stars: 3, text: 'メラニン生成を抑制し、シミ予防と美白効果が期待できます。日常的なメンテナンスにも最適。' }
+          ],
+          not: [
+            { name: 'ピーリング（強め）', text: '現在の肌状態では刺激が強く、炎症や赤みの悪化リスクがあります。まずはマイルドなケアで肌を整えてからの検討をおすすめします。' },
+            { name: 'フラクショナルレーザー', text: 'ダウンタイムが長く、シミの程度からも負担の少ない光治療やピーリングの方が適しています。' }
+          ]
+        },
+        'シワ・たるみ': {
+          rec: [
+            { name: 'ボトックス（ボツリヌストキシン）', stars: 5, text: '表情ジワの原因となる筋肉の動きを抑制。目尻・額・眉間のシワ改善に即効性があります。' },
+            { name: 'ヒアルロン酸注入', stars: 5, text: '深いシワやほうれい線に直接ボリュームを補充。自然な仕上がりで即効性が高いです。' },
+            { name: 'ハイフ（HIFU）', stars: 4, text: '真皮深層〜SMAS筋膜に熱エネルギーを届け、リフトアップ効果が期待できます。' },
+            { name: 'レーザーリフティング', stars: 3, text: 'コラーゲン産生を促進し、肌のハリ・弾力を高めます。継続ケアで効果が現れます。' }
+          ],
+          not: [
+            { name: '光治療（IPL）', text: 'シワ・たるみへの直接的な効果は限定的です。シワ改善を主目的とする場合は他の施術が適しています。' },
+            { name: 'ケミカルピーリング（単独）', text: '表面のキメは整いますが、深いシワやたるみへの効果は十分ではありません。' }
+          ]
+        },
+        '毛穴・テクスチャー': {
+          rec: [
+            { name: 'フラクショナルレーザー', stars: 5, text: '毛穴の開きとキメの乱れを同時に改善。コラーゲン産生を促し、なめらかな肌質へ導きます。' },
+            { name: 'ケミカルピーリング', stars: 4, text: '角質を除去してターンオーバーを促進。毛穴詰まりの改善とテクスチャー向上に効果的です。' },
+            { name: 'ポテンツァ（RF）', stars: 4, text: 'マイクロニードルRFが毛穴を引き締め、皮脂コントロールにも優れた効果を発揮します。' },
+            { name: 'イオン導入（ビタミンC）', stars: 3, text: '毛穴の酸化を防ぎ、日常的な肌質維持のベースケアとして最適です。' }
+          ],
+          not: [
+            { name: '光治療（IPL）単独', text: '毛穴の物理的な開きへの直接効果は低いです。テクスチャー改善にはピーリングやRFの方が適しています。' },
+            { name: 'ヒアルロン酸注入', text: '毛穴・テクスチャー改善には適応しない施術です。' }
+          ]
+        },
+        '赤み・敏感肌': {
+          rec: [
+            { name: '光治療（IPL・赤み対応）', stars: 5, text: '血管性の赤みやニキビ痕の赤みを選択的に照射。肌への刺激を抑えながら赤みを改善します。' },
+            { name: 'Vビーム（色素レーザー）', stars: 5, text: '赤みの原因となる血管に直接アプローチ。酒さや毛細血管拡張症に特に効果的です。' },
+            { name: 'LED光線療法', stars: 4, text: '非侵襲的に炎症を鎮静させ、バリア機能の回復を促します。敏感肌に安心な施術です。' },
+            { name: '保湿・バリア補強ケア', stars: 3, text: 'セラミド・ヒアルロン酸を中心とした集中保湿でバリア機能を整え、赤みの根本原因に対処します。' }
+          ],
+          not: [
+            { name: 'フラクショナルレーザー', text: '敏感肌・炎症傾向のある肌には刺激が強く、赤みや炎症を悪化させるリスクがあります。' },
+            { name: 'ケミカルピーリング（強め）', text: '現在の肌状態ではバリア機能が低下しており、強い酸性ピーリングは症状を悪化させる可能性があります。' }
+          ]
+        }
+      };
+
+      var concern = d.concern || 'シミ・くすみ';
+      var td = treatmentData[concern] || treatmentData['シミ・くすみ'];
+      var mt0 = document.getElementById('mt0');
+      if (mt0 && td) {
+        var html = '<h3 style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:12px">✓ おすすめ施術</h3>';
+        td.rec.forEach(function (t) {
+          var dots = '';
+          for (var i = 0; i < 5; i++) dots += '<span class="d' + (i < t.stars ? ' a' : '') + '"></span>';
+          html += '<div class="tc rec lg"><div class="e"></div><div class="t"></div><div class="s"></div><div class="c"><div class="th"><h4>' + t.name + '</h4><span class="tb r">おすすめ</span></div><div class="rl">' + dots + '<span class="rlt">おすすめ度 ' + t.stars + '/5</span></div><p class="tp">' + t.text + '</p></div></div>';
+        });
+        html += '<h3 style="font-size:14px;font-weight:700;color:var(--red);margin:20px 0 12px">✗ おすすめしない施術</h3>';
+        td.not.forEach(function (t) {
+          html += '<div class="tc not lg"><div class="e"></div><div class="t"></div><div class="s"></div><div class="c"><div class="th"><h4>' + t.name + '</h4><span class="tb nt">おすすめしない</span></div><p class="tp">' + t.text + '</p></div></div>';
+        });
+        mt0.innerHTML = html;
+      }
+    })();
+
+    // Reveal
+    var obs = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('v'); obs.unobserve(e.target) } }) }, { threshold: 0.08 });
+    document.querySelectorAll('.rv').forEach(function (el) { obs.observe(el) });
+
+    // Hover glow
+    document.querySelectorAll('.tc,.pc').forEach(function (c) {
+      c.addEventListener('mousemove', function (e) { var r = c.getBoundingClientRect(); var t = c.querySelector('.t'); var x = ((e.clientX - r.left) / r.width * 100).toFixed(1); var y = ((e.clientY - r.top) / r.height * 100).toFixed(1); t.style.background = 'radial-gradient(circle 120px at ' + x + '% ' + y + '%,rgba(255,255,255,.55),rgba(255,255,255,.4))'; });
+      c.addEventListener('mouseleave', function () { c.querySelector('.t').style.background = 'rgba(255,255,255,.4)'; });
+    });
+
+    // Cosme tabs
+    function switchMainTab(idx) {
+      document.querySelectorAll('.mt-btn').forEach(function (t, i) { t.classList.toggle('active', i === idx) });
+      document.querySelectorAll('.mt-panel').forEach(function (p, i) { p.classList.toggle('active', i === idx) });
+      document.querySelectorAll('#mt' + idx + ' .rv').forEach(function (el) { if (!el.classList.contains('v')) obs.observe(el) });
+    }
+    function switchCosmeTab(idx) {
+      document.querySelectorAll('.cosme-tab').forEach(function (t, i) { t.classList.toggle('active', i === idx) });
+      document.querySelectorAll('.cosme-panel').forEach(function (p, i) { p.classList.toggle('active', i === idx) });
+      // Re-observe for reveal animation
+      document.querySelectorAll('#cp' + idx + ' .rv').forEach(function (el) { if (!el.classList.contains('v')) obs.observe(el) });
+    }
+  </script>
+
+  <!-- ═══ AI ANALYSIS RESULTS ═══ -->
+  <script>
+  (function () {
+    var raw = localStorage.getItem('aimyAnalysis');
+    if (!raw) return;
+    var d;
+    try { d = JSON.parse(raw); } catch (e) { return; }
+
+    /* ── ヘルパー：スコアに応じた色 ── */
+    function scoreColor(s) {
+      if (s >= 75) return { bar: 'linear-gradient(90deg,#16a34a,#22c55e)', text: '#22c55e' };
+      if (s >= 65) return { bar: 'linear-gradient(90deg,var(--navy),var(--blue))', text: 'var(--blue)' };
+      if (s >= 50) return { bar: 'linear-gradient(90deg,#d97706,#f59e0b)', text: '#f59e0b' };
+      return { bar: 'linear-gradient(90deg,#b91c1c,#d4425c)', text: '#d4425c' };
+    }
+
+    /* ── Overview スコアバー更新 ── */
+    function updateOverviewRow(labelText, score) {
+      document.querySelectorAll('span').forEach(function (span) {
+        if (span.textContent.trim() !== labelText) return;
+        var row = span.parentElement;
+        if (!row) return;
+        var fill = row.querySelector('div > div');
+        var spans = row.querySelectorAll('span');
+        var valSpan = spans[spans.length - 1];
+        if (fill) { fill.style.width = score + '%'; var c = scoreColor(score); fill.style.background = c.bar; }
+        if (valSpan && valSpan !== span) { valSpan.textContent = score; var c2 = scoreColor(score); valSpan.style.color = c2.text; }
+      });
+    }
+
+    /* ── Mini-metric バー更新（.asc 内の .ms ブロック） ── */
+    function updateMiniMetrics(ascId, metricsMap) {
+      var asc = document.getElementById(ascId);
+      if (!asc) return;
+      asc.querySelectorAll('.ms').forEach(function (ms) {
+        var ml = ms.querySelector('.ml');
+        if (!ml) return;
+        var label = ml.textContent.trim();
+        if (!(label in metricsMap)) return;
+        var val = metricsMap[label];
+        var mv = ms.querySelector('.mv');
+        var mf = ms.querySelector('.mf');
+        if (mv) mv.innerHTML = val + '<small>/100</small>';
+        if (mf) mf.style.width = val + '%';
+      });
+    }
+
+    /* ── 分析テキスト更新 ── */
+    function setText(spanId, text) {
+      var el = document.getElementById(spanId);
+      if (el && text) el.textContent = text;
+    }
+
+    /* ── サマリー ── */
+    if (d.summary) {
+      var at = document.getElementById('analysisText');
+      if (at) at.textContent = d.summary;
+    }
+
+    /* ── Overview スコア ── */
+    if (d.shimi) {
+      updateOverviewRow('シミ', d.shimi.score);
+      updateOverviewRow('隠れジミ', d.shimi.kakureshimi != null ? d.shimi.kakureshimi : d.shimi.score);
+      updateOverviewRow('くすみ', d.shimi.kusumi != null ? d.shimi.kusumi : d.shimi.score);
+    }
+    if (d.akami) updateOverviewRow('赤み', d.akami.score);
+    if (d.texture) {
+      updateOverviewRow('キメ', d.texture.score);
+      updateOverviewRow('ツヤ', d.texture.glow != null ? d.texture.glow : d.texture.score);
+    }
+    if (d.keana) updateOverviewRow('毛穴', d.keana.score);
+    if (d.shiwa) {
+      updateOverviewRow('シワ', d.shiwa.score);
+      updateOverviewRow('肌年齢', d.skin_age != null ? Math.min(d.skin_age, 99) : 69);
+    }
+
+    /* ── Mini-metrics ── */
+    if (d.shimi) {
+      updateMiniMetrics('asc-shimi', {
+        'シミ濃度': d.shimi.concentration != null ? d.shimi.concentration : d.shimi.score,
+        '分布範囲': d.shimi.range != null ? d.shimi.range : d.shimi.score,
+        '色ムラ': d.shimi.unevenness != null ? d.shimi.unevenness : d.shimi.score,
+        'くすみ度': d.shimi.kusumi != null ? d.shimi.kusumi : d.shimi.score
+      });
+    }
+    if (d.shiwa) {
+      updateMiniMetrics('asc-shiwa', {
+        'シワ深度': d.shiwa.depth != null ? d.shiwa.depth : d.shiwa.score,
+        '額のシワ': d.shiwa.forehead != null ? d.shiwa.forehead : d.shiwa.score,
+        '目尻のシワ': d.shiwa.eye_corner != null ? d.shiwa.eye_corner : d.shiwa.score,
+        'ほうれい線': d.shiwa.nasolabial != null ? d.shiwa.nasolabial : d.shiwa.score
+      });
+    }
+    if (d.texture) {
+      updateMiniMetrics('asc-texture', {
+        'キメ細かさ': d.texture.fineness != null ? d.texture.fineness : d.texture.score,
+        'ハリ・弾力': d.texture.elasticity != null ? d.texture.elasticity : d.texture.score,
+        'なめらかさ': d.texture.smoothness != null ? d.texture.smoothness : d.texture.score,
+        'ツヤ': d.texture.glow != null ? d.texture.glow : d.texture.score
+      });
+    }
+    if (d.keana) {
+      updateMiniMetrics('asc-keana', {
+        '毛穴の開き': d.keana.opening != null ? d.keana.opening : d.keana.score,
+        '黒ずみ': d.keana.blackheads != null ? d.keana.blackheads : d.keana.score,
+        '詰まり': d.keana.clogging != null ? d.keana.clogging : d.keana.score,
+        'たるみ毛穴': d.keana.sagging != null ? d.keana.sagging : d.keana.score
+      });
+    }
+    if (d.akami) {
+      updateMiniMetrics('asc-akami', {
+        '赤み強度': d.akami.intensity != null ? d.akami.intensity : d.akami.score,
+        '鼻周り': d.akami.nose_area != null ? d.akami.nose_area : d.akami.score,
+        '頬の赤み': d.akami.cheek != null ? d.akami.cheek : d.akami.score,
+        '炎症リスク': d.akami.inflammation_risk != null ? d.akami.inflammation_risk : d.akami.score
+      });
+    }
+
+    /* ── 分析テキスト ── */
+    if (d.shimi) setText('ad-shimi-text', d.shimi.description);
+    if (d.shiwa) setText('ad-shiwa-text', d.shiwa.description);
+    if (d.texture) setText('ad-texture-text', d.texture.description);
+    if (d.keana) setText('ad-keana-text', d.keana.description);
+    if (d.akami) setText('ad-akami-text', d.akami.description);
+
+    /* ── 総合スコア ── */
+    if (d.overall_score != null) {
+      var tsn = document.getElementById('totalScoreNum');
+      if (tsn) tsn.innerHTML = d.overall_score + '<small>/100</small>';
+      var tsj = document.getElementById('totalScoreJudge');
+      if (tsj) {
+        var jLabel = d.overall_score >= 80 ? '優秀' : d.overall_score >= 70 ? '良好' : d.overall_score >= 60 ? '普通' : '要注意';
+        tsj.textContent = jLabel;
+      }
+    }
+
+    /* ── お悩みスコアバー ── */
+    function updateBar(fillId, valId, score) {
+      var fill = document.getElementById(fillId);
+      var val = document.getElementById(valId);
+      var c = scoreColor(score);
+      if (fill) { fill.style.width = score + '%'; fill.style.background = c.bar; }
+      if (val) { val.textContent = score; val.style.color = c.text; }
+    }
+    if (d.shimi) {
+      updateBar('bar-fill-shimi', 'bar-val-shimi', d.shimi.score);
+      updateBar('bar-fill-kakureshimi', 'bar-val-kakureshimi', d.shimi.kakureshimi != null ? d.shimi.kakureshimi : d.shimi.score);
+      updateBar('bar-fill-kusumi', 'bar-val-kusumi', d.shimi.kusumi != null ? d.shimi.kusumi : d.shimi.score);
+    }
+    if (d.akami) updateBar('bar-fill-akami', 'bar-val-akami', d.akami.score);
+    if (d.texture) updateBar('bar-fill-kime', 'bar-val-kime', d.texture.score);
+    if (d.keana) updateBar('bar-fill-keana', 'bar-val-keana', d.keana.score);
+    if (d.shiwa) updateBar('bar-fill-shiwa', 'bar-val-shiwa', d.shiwa.score);
+    if (d.skin_age != null) updateBar('bar-fill-hadanen', 'bar-val-hadanen', Math.min(d.skin_age, 99));
+
+    /* ── レーダーチャート再描画 ── */
+    if (typeof window.drawRadar === 'function') {
+      var avg = { シミ: 70, 隠れジミ: 65, 毛穴: 72, キメ: 70, くすみ: 68, 赤み: 62, シワ: 70, フェイスライン: 68, 左右差: 72, 肌年齢: 65 };
+      function colorFor(v) { return v >= 75 ? '#22c55e' : v >= 65 ? '#4f7df5' : v >= 50 ? '#f59e0b' : '#d4425c'; }
+      var shimiScore = (d.shimi || {}).score || 82;
+      var kakureScore = (d.shimi || {}).kakureshimi || shimiScore;
+      var kusumiScore = (d.shimi || {}).kusumi || shimiScore;
+      var akamiScore = (d.akami || {}).score || 58;
+      var textureScore = (d.texture || {}).score || 79;
+      var keanaScore = (d.keana || {}).score || 74;
+      var shiwaScore = (d.shiwa || {}).score || 72;
+      var facelineScore = (d.shiwa || {}).face_line || Math.round((shiwaScore + 4));
+      var hadanenScore = d.skin_age != null ? Math.min(d.skin_age, 99) : 69;
+      var sc = [
+        { l: 'シミ', v: shimiScore, a: avg['シミ'], c: colorFor(shimiScore) },
+        { l: '隠れジミ', v: kakureScore, a: avg['隠れジミ'], c: colorFor(kakureScore) },
+        { l: '毛穴', v: keanaScore, a: avg['毛穴'], c: colorFor(keanaScore) },
+        { l: 'キメ', v: textureScore, a: avg['キメ'], c: colorFor(textureScore) },
+        { l: 'くすみ', v: kusumiScore, a: avg['くすみ'], c: colorFor(kusumiScore) },
+        { l: '赤み', v: akamiScore, a: avg['赤み'], c: colorFor(akamiScore) },
+        { l: 'シワ', v: shiwaScore, a: avg['シワ'], c: colorFor(shiwaScore) },
+        { l: 'フェイスライン', v: facelineScore, a: avg['フェイスライン'], c: colorFor(facelineScore) },
+        { l: '左右差', v: 70, a: avg['左右差'], c: colorFor(70) },
+        { l: '肌年齢', v: hadanenScore, a: avg['肌年齢'], c: colorFor(hadanenScore) }
+      ];
+      window.drawRadar(sc);
+    }
+
+    console.log('[AIMY report] AI分析反映完了 overall:', d.overall_score, '肌年齢:', d.skin_age);
+  })();
+  </script>
+
+  <!-- ═══ PHOTO PROCESSING ═══ -->
+  <script>
+  (function () {
+    var raw = localStorage.getItem('aimyPhotoRaw');
+
+    // デバッグ用バッジ（5秒後に消える）
+    var dbg = document.createElement('div');
+    dbg.style.cssText = 'position:fixed;bottom:16px;right:16px;background:rgba(0,0,0,.75);color:#fff;font-size:11px;padding:6px 12px;border-radius:8px;z-index:9999;font-family:monospace;pointer-events:none';
+    dbg.textContent = raw ? ('✓ photo ' + Math.round(raw.length / 1024) + 'KB') : '✗ photo: none';
+    document.body.appendChild(dbg);
+    setTimeout(function () { dbg.style.opacity = '0'; dbg.style.transition = 'opacity .5s'; setTimeout(function(){ dbg.remove(); }, 500); }, 5000);
+
+    console.log('[AIMY report] aimyPhotoRaw:', raw ? Math.round(raw.length/1024)+'KB' : 'null');
+    if (!raw) return;
+
+    var concern = 'シミ・くすみ';
+    try { concern = JSON.parse(localStorage.getItem('aimyChatData')).concern || concern; } catch (e) {}
+
+    /* ── Helpers ── */
+    function mkRng(seed) {
+      var s = (seed >>> 0) || 1;
+      return function () { s = ((s * 1664525) + 1013904223) & 0x7fffffff; return s / 0x7fffffff; };
+    }
+
+    /* ── Aging effects ── */
+    function applyShimi(ctx, w, h, sev) {
+      var rng = mkRng(1001), count = Math.floor(sev * 45 + 8);
+      ctx.save();
+      for (var i = 0; i < count; i++) {
+        var zone = Math.floor(rng() * 4), x, y;
+        if (zone === 0)      { x = (.12 + rng() * .22) * w; y = (.28 + rng() * .35) * h; }
+        else if (zone === 1) { x = (.66 + rng() * .22) * w; y = (.28 + rng() * .35) * h; }
+        else if (zone === 2) { x = (.25 + rng() * .50) * w; y = (.04 + rng() * .18) * h; }
+        else                 { x = (.38 + rng() * .24) * w; y = (.28 + rng() * .20) * h; }
+        var r = 5 + rng() * 14 * sev;
+        var a = 0.15 + rng() * 0.30 * sev;
+        var r1 = 80 + Math.floor(rng() * 55), g1 = 38 + Math.floor(rng() * 32), b1 = 8 + Math.floor(rng() * 15);
+        var gr = ctx.createRadialGradient(x, y, 0, x, y, r);
+        gr.addColorStop(0,    'rgba(' + r1 + ',' + g1 + ',' + b1 + ',' + (a * 1.5) + ')');
+        gr.addColorStop(0.55, 'rgba(' + r1 + ',' + g1 + ',' + b1 + ',' + a + ')');
+        gr.addColorStop(1,    'rgba(' + r1 + ',' + g1 + ',' + b1 + ',0)');
+        ctx.globalCompositeOperation = 'multiply';
+        ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    function applyKusumi(ctx, w, h, sev) {
+      ctx.save(); ctx.globalCompositeOperation = 'multiply';
+      ctx.fillStyle = 'rgba(155,135,115,' + (sev * 0.28) + ')'; ctx.fillRect(0, 0, w, h);
+      var gr = ctx.createRadialGradient(w * .5, h * .42, 0, w * .5, h * .42, w * .5);
+      gr.addColorStop(0, 'rgba(140,118,98,' + (sev * 0.18) + ')');
+      gr.addColorStop(1, 'rgba(140,118,98,0)');
+      ctx.fillStyle = gr; ctx.fillRect(0, 0, w, h); ctx.restore();
+    }
+
+    function applyShiwa(ctx, w, h, sev) {
+      var lines = [
+        [.20,.12,.40,.10,.60,.10,.80,.12],[.22,.18,.40,.16,.60,.16,.78,.18],[.24,.24,.42,.21,.58,.21,.76,.24],
+        [.72,.30,.78,.30,.83,.32,.85,.29],[.72,.33,.79,.34,.83,.36,.85,.37],
+        [.28,.30,.22,.30,.17,.32,.15,.29],[.28,.33,.21,.34,.17,.36,.15,.37],
+        [.35,.52,.30,.60,.30,.65,.35,.72],[.65,.52,.70,.60,.70,.65,.65,.72]
+      ];
+      ctx.save(); ctx.globalCompositeOperation = 'multiply';
+      ctx.strokeStyle = 'rgba(70,50,40,' + (sev * 0.55) + ')';
+      ctx.lineWidth = 1 + sev * 2; ctx.lineCap = 'round';
+      lines.forEach(function (l) {
+        ctx.beginPath(); ctx.moveTo(l[0]*w, l[1]*h);
+        ctx.bezierCurveTo(l[2]*w, l[3]*h, l[4]*w, l[5]*h, l[6]*w, l[7]*h); ctx.stroke();
+      });
+      ctx.restore();
+    }
+
+    function applyTarumi(ctx, w, h, sev) {
+      ctx.save(); ctx.globalCompositeOperation = 'multiply';
+      [[.28,.78],[.72,.78],[.5,.82]].forEach(function (p) {
+        var gr = ctx.createRadialGradient(p[0]*w, p[1]*h, 0, p[0]*w, p[1]*h, w * .22);
+        gr.addColorStop(0, 'rgba(90,72,62,' + (sev * .28) + ')');
+        gr.addColorStop(1, 'rgba(90,72,62,0)');
+        ctx.fillStyle = gr; ctx.fillRect(0, 0, w, h);
+      });
+      ctx.restore();
+    }
+
+    function applyKeana(ctx, w, h, sev) {
+      var rng = mkRng(3003), count = Math.floor(sev * 320 + 60);
+      ctx.save(); ctx.globalCompositeOperation = 'multiply';
+      for (var i = 0; i < count; i++) {
+        var isNose = rng() < .5, x, y;
+        if (isNose) { x = (.38 + rng() * .24) * w; y = (.36 + rng() * .28) * h; }
+        else { x = (rng() < .5 ? (.10 + rng() * .20) : (.70 + rng() * .20)) * w; y = (.28 + rng() * .32) * h; }
+        var r = .6 + rng() * 1.8 * sev;
+        ctx.fillStyle = 'rgba(55,38,28,' + (0.22 + rng() * .38 * sev) + ')';
+        ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    function applyTexAge(ctx, w, h, sev) {
+      var nc = document.createElement('canvas'); nc.width = 64; nc.height = 64;
+      var nctx = nc.getContext('2d'), rng = mkRng(4004), id = nctx.createImageData(64, 64);
+      for (var i = 0; i < id.data.length; i += 4) {
+        var v = Math.floor((rng() - .5) * 110 * sev + 128);
+        id.data[i] = id.data[i+1] = id.data[i+2] = v; id.data[i+3] = Math.floor(sev * 45);
+      }
+      nctx.putImageData(id, 0, 0);
+      ctx.save(); ctx.globalCompositeOperation = 'overlay';
+      ctx.fillStyle = ctx.createPattern(nc, 'repeat'); ctx.fillRect(0, 0, w, h); ctx.restore();
+    }
+
+    function applyAkami(ctx, w, h, sev) {
+      ctx.save(); ctx.globalCompositeOperation = 'source-over';
+      [{x:.25,y:.46,rx:.16,ry:.13},{x:.75,y:.46,rx:.16,ry:.13},{x:.5,y:.43,rx:.09,ry:.09}].forEach(function (z) {
+        var cx = z.x*w, cy = z.y*h, r = Math.max(z.rx*w, z.ry*h);
+        var gr = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+        gr.addColorStop(0,   'rgba(215,55,55,' + (sev * .42) + ')');
+        gr.addColorStop(.65, 'rgba(195,75,75,' + (sev * .20) + ')');
+        gr.addColorStop(1,   'rgba(195,75,75,0)');
+        ctx.save(); ctx.translate(cx,cy); ctx.scale(z.rx*w/r, z.ry*h/r); ctx.translate(-cx,-cy);
+        ctx.fillStyle = gr; ctx.fillRect(0, 0, w, h); ctx.restore();
+      });
+      ctx.restore();
+    }
+
+    /* ── Heatmap helpers ── */
+    function hmBase(ctx, w, h, spots, lineColor) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(12,22,58,0.28)'; ctx.fillRect(0, 0, w, h);
+      spots.forEach(function (s) {
+        var gr = ctx.createRadialGradient(s[0]*w, s[1]*h, 0, s[0]*w, s[1]*h, s[2]*Math.min(w,h));
+        gr.addColorStop(0,    s[3]);
+        gr.addColorStop(.55,  s[4] || s[3].replace(/[\d.]+\)$/, '0.28)'));
+        gr.addColorStop(1,    'rgba(0,0,0,0)');
+        ctx.fillStyle = gr; ctx.fillRect(0, 0, w, h);
+      });
+      for (var y = 0; y < h; y += 4) { ctx.fillStyle = 'rgba(0,0,0,0.035)'; ctx.fillRect(0, y, w, 1); }
+      ctx.strokeStyle = lineColor || 'rgba(79,125,245,0.5)'; ctx.lineWidth = 2;
+      ctx.strokeRect(1, 1, w-2, h-2);
+      ctx.restore();
+    }
+
+    function hmShimi(ctx, w, h) {
+      hmBase(ctx, w, h, [
+        [.24,.42,.28,'rgba(238,115,18,0.72)','rgba(238,115,18,0.36)'],
+        [.76,.42,.28,'rgba(238,115,18,0.68)','rgba(238,115,18,0.32)'],
+        [.50,.14,.24,'rgba(218,155,35,0.58)','rgba(218,155,35,0.26)'],
+        [.50,.38,.13,'rgba(198,95,18,0.42)']
+      ], 'rgba(240,120,20,0.5)');
+    }
+
+    function hmShiwa(ctx, w, h) {
+      hmBase(ctx, w, h, [
+        [.50,.16,.36,'rgba(75,115,240,0.62)','rgba(75,115,240,0.30)'],
+        [.18,.33,.16,'rgba(95,155,255,0.52)','rgba(95,155,255,0.26)'],
+        [.82,.33,.16,'rgba(95,155,255,0.52)','rgba(95,155,255,0.26)'],
+        [.34,.63,.13,'rgba(55,95,200,0.44)'],[.66,.63,.13,'rgba(55,95,200,0.44)']
+      ], 'rgba(100,150,255,0.5)');
+      ctx.save(); ctx.strokeStyle = 'rgba(140,195,255,0.55)'; ctx.lineWidth = 1.5; ctx.setLineDash([5,3]);
+      [[.20,.11,.80,.11],[.22,.17,.78,.17],[.24,.23,.76,.23]].forEach(function (l) {
+        ctx.beginPath(); ctx.moveTo(l[0]*w, l[1]*h);
+        ctx.quadraticCurveTo(w*.5, (l[1]-.02)*h, l[2]*w, l[3]*h); ctx.stroke();
+      });
+      ctx.restore();
+    }
+
+    function hmTexture(ctx, w, h) {
+      hmBase(ctx, w, h, [
+        [.50,.40,.32,'rgba(45,195,95,0.52)','rgba(45,195,95,0.26)'],
+        [.50,.24,.22,'rgba(95,215,75,0.42)'],[.28,.50,.22,'rgba(38,175,115,0.36)'],
+        [.72,.50,.22,'rgba(38,175,115,0.36)']
+      ], 'rgba(50,200,100,0.5)');
+    }
+
+    function hmKeana(ctx, w, h) {
+      hmBase(ctx, w, h, [
+        [.50,.42,.16,'rgba(155,55,215,0.68)','rgba(155,55,215,0.32)'],
+        [.26,.48,.20,'rgba(135,75,195,0.52)','rgba(135,75,195,0.26)'],
+        [.74,.48,.20,'rgba(135,75,195,0.52)','rgba(135,75,195,0.26)'],
+        [.50,.58,.11,'rgba(115,55,175,0.42)']
+      ], 'rgba(160,60,220,0.5)');
+    }
+
+    function hmAkami(ctx, w, h) {
+      hmBase(ctx, w, h, [
+        [.24,.46,.24,'rgba(235,45,45,0.68)','rgba(235,45,45,0.32)'],
+        [.76,.46,.24,'rgba(235,45,45,0.68)','rgba(235,45,45,0.32)'],
+        [.50,.43,.13,'rgba(255,95,75,0.72)','rgba(255,95,75,0.36)']
+      ], 'rgba(220,50,50,0.5)');
+    }
+
+    function hmKanpan(ctx, w, h) {
+      hmBase(ctx, w, h, [
+        [.28,.50,.22,'rgba(160,90,20,0.60)','rgba(160,90,20,0.26)'],
+        [.72,.50,.22,'rgba(160,90,20,0.60)','rgba(160,90,20,0.26)'],
+        [.50,.38,.20,'rgba(140,70,15,0.52)','rgba(140,70,15,0.22)']
+      ], 'rgba(165,85,20,0.42)');
+    }
+
+    function hmBuibetsu(ctx, w, h) {
+      ctx.save();
+
+      // ── 顔の実際の範囲をピクセル解析で取得 ──
+      var imgData = ctx.getImageData(0, 0, w, h);
+      var d = imgData.data;
+      var minX = w, maxX = 0, minY = h, maxY = 0;
+      var step = 4; // 4px おきにサンプリングして高速化
+      for (var py = 0; py < h; py += step) {
+        for (var px = 0; px < w; px += step) {
+          var i = (py * w + px) * 4;
+          if (d[i] + d[i+1] + d[i+2] > 80) { // 暗い背景以外 = 顔
+            if (px < minX) minX = px;
+            if (px > maxX) maxX = px;
+            if (py < minY) minY = py;
+            if (py > maxY) maxY = py;
+          }
+        }
+      }
+      // フォールバック（顔が検出できなかった場合）
+      if (maxX <= minX) { minX = 0; maxX = w; minY = 0; maxY = h; }
+      var fw = maxX - minX, fh = maxY - minY;
+
+      // ── ゾーン定義（顔バウンディングボックス相対座標）──
+      var zones = [
+        {x:.50, y:.14, s:72, c:[79,125,245]},   // 額
+        {x:.18, y:.50, s:65, c:[245,158,11]},   // 左頬
+        {x:.82, y:.50, s:68, c:[245,158,11]},   // 右頬
+        {x:.50, y:.48, s:58, c:[212,66,92]},    // 鼻
+        {x:.50, y:.65, s:76, c:[34,197,94]},    // 口元
+        {x:.50, y:.80, s:80, c:[34,197,94]}     // 顎
+      ];
+
+      ctx.fillStyle = 'rgba(8,18,50,0.28)'; ctx.fillRect(0, 0, w, h);
+      var rad = Math.min(fw, fh) * .09;
+      zones.forEach(function (z) {
+        var cx = minX + fw * z.x;
+        var cy = minY + fh * z.y;
+        var c = z.c;
+        var gr = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
+        gr.addColorStop(0, 'rgba('+c[0]+','+c[1]+','+c[2]+',0.60)');
+        gr.addColorStop(1, 'rgba('+c[0]+','+c[1]+','+c[2]+',0)');
+        ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(cx, cy, rad, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,0.95)';
+        ctx.font = 'bold ' + Math.floor(rad * .72) + 'px Outfit,sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(z.s, cx, cy);
+      });
+      for (var y = 0; y < h; y += 4) { ctx.fillStyle = 'rgba(0,0,0,0.03)'; ctx.fillRect(0, y, w, 1); }
+      ctx.strokeStyle = 'rgba(79,125,245,0.5)'; ctx.lineWidth = 2; ctx.strokeRect(1, 1, w-2, h-2);
+      ctx.restore();
+    }
+
+    function hmZentai(ctx, w, h) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(8,18,55,0.32)'; ctx.fillRect(0, 0, w, h);
+      var gr = ctx.createRadialGradient(w*.5, h*.44, 0, w*.5, h*.44, w*.55);
+      gr.addColorStop(0,   'rgba(79,125,245,0.48)');
+      gr.addColorStop(.55, 'rgba(0,184,212,0.28)');
+      gr.addColorStop(1,   'rgba(0,184,212,0)');
+      ctx.fillStyle = gr; ctx.fillRect(0, 0, w, h);
+      var cr = Math.min(w, h) * .11;
+      ctx.fillStyle = 'rgba(8,18,55,0.72)'; ctx.beginPath(); ctx.arc(w*.84, h*.09, cr, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.96)';
+      ctx.font = 'bold ' + Math.floor(cr * .95) + 'px Outfit,sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('72', w*.84, h*.09);
+      ctx.font = Math.floor(cr * .45) + 'px "Noto Sans JP",sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,0.72)'; ctx.fillText('総合', w*.84, h*.09 + cr * .62);
+      for (var y = 0; y < h; y += 4) { ctx.fillStyle = 'rgba(0,0,0,0.03)'; ctx.fillRect(0, y, w, 1); }
+      ctx.strokeStyle = 'rgba(79,125,245,0.5)'; ctx.lineWidth = 2; ctx.strokeRect(1, 1, w-2, h-2);
+      ctx.restore();
+    }
+
+    /* ── Main ── */
+    var ageMap = {
+      'シミ・くすみ':       [applyShimi, applyKusumi],
+      'シワ・たるみ':       [applyShiwa, applyTarumi],
+      '毛穴・テクスチャー': [applyKeana, applyTexAge],
+      '赤み・敏感肌':       [applyAkami]
+    };
+    var efs = ageMap[concern] || ageMap['シミ・くすみ'];
+
+    var baseImg = new Image();
+    baseImg.onload = function () {
+      var W = baseImg.naturalWidth, H = baseImg.naturalHeight;
+
+      function make(fn) {
+        var c = document.createElement('canvas'); c.width = W; c.height = H;
+        var ctx = c.getContext('2d'); ctx.drawImage(baseImg, 0, 0);
+        try { if (fn) fn(ctx, W, H); } catch (e) {}
+        return c.toDataURL('image/jpeg', 0.80);
+      }
+
+      // Python API 生成画像があれば優先、なければ JS Canvas フォールバック
+      var shimi10y   = localStorage.getItem('aimyShimi10y');
+      var shimi20y   = localStorage.getItem('aimyShimi20y');
+      var shimiMap   = localStorage.getItem('aimyShimiMap');
+      var shiwaPy    = localStorage.getItem('aimyShiwa');
+      var texturePy  = localStorage.getItem('aimyTexture');
+      var keanaPy    = localStorage.getItem('aimyKeana');
+      var akamiPy    = localStorage.getItem('aimyAkami');
+      var faceMasked = localStorage.getItem('aimyFaceMasked');
+      if (faceMasked) console.log('[AIMY report] 顔マスク '            + Math.round(faceMasked.length/1024) + 'KB');
+      if (shimi10y)   console.log('[AIMY report] Python シミ10年後 '   + Math.round(shimi10y.length/1024)   + 'KB');
+      if (shimi20y)   console.log('[AIMY report] Python シミ20年後 '   + Math.round(shimi20y.length/1024)   + 'KB');
+      if (shimiMap)   console.log('[AIMY report] Python シミマップ '   + Math.round(shimiMap.length/1024)   + 'KB');
+      if (shiwaPy)    console.log('[AIMY report] Python シワ '         + Math.round(shiwaPy.length/1024)    + 'KB');
+      if (texturePy)  console.log('[AIMY report] Python テクスチャー ' + Math.round(texturePy.length/1024)  + 'KB');
+      if (keanaPy)    console.log('[AIMY report] Python 毛穴 '         + Math.round(keanaPy.length/1024)    + 'KB');
+      if (akamiPy)    console.log('[AIMY report] Python 赤み '         + Math.round(akamiPy.length/1024)    + 'KB');
+
+      // face_current には顔マスク画像を優先使用（なければ元写真）
+      var faceCurrentSrc = faceMasked || raw;
+
+      var built = {
+        'face_current.png': faceCurrentSrc,
+        'face_10years.png': shimi10y  || faceCurrentSrc,
+        'face_20years.png': shimi20y  || faceCurrentSrc,
+        'map_shimi.png':    shimiMap || make(function (ctx, w, h) { hmShimi(ctx, w, h); }),
+        'map_shiwa.png':    shiwaPy  || make(function (ctx, w, h) { hmShiwa(ctx, w, h); }),
+        'map_texture.png':  texturePy || make(function (ctx, w, h) { hmTexture(ctx, w, h); }),
+        'map_keana.png':    keanaPy   || make(function (ctx, w, h) { hmKeana(ctx, w, h); }),
+        'map_akami.png':    akamiPy   || make(function (ctx, w, h) { hmAkami(ctx, w, h); }),
+        'map_kanpan.png':   make(function (ctx, w, h) { hmKanpan(ctx, w, h); }),
+        'map_buibetsu.png': make(function (ctx, w, h) { hmBuibetsu(ctx, w, h); }),
+        'map_zentai.png':   make(function (ctx, w, h) { hmZentai(ctx, w, h); })
+      };
+
+      function replaceAll(map) {
+        var count = 0;
+        document.querySelectorAll('img').forEach(function (el) {
+          var s = el.getAttribute('src') || '';
+          for (var k in map) {
+            if (s.indexOf(k) !== -1 && map[k]) { el.setAttribute('src', map[k]); count++; break; }
+          }
+        });
+        console.log('[AIMY report] 差し替え:', count + '件');
+      }
+      replaceAll(built);
+      console.log('[AIMY report] Step2完了（Canvas加工）');
+    };
+    baseImg.onerror = function () { console.error('[AIMY report] baseImg読み込みエラー'); };
+    // Step1: 顔マスク画像（なければ元写真）を即座に差し替え
+    var faceMaskedStep1 = localStorage.getItem('aimyFaceMasked') || raw;
+    baseImg.src = faceMaskedStep1;
+
+    document.querySelectorAll('img').forEach(function (el) {
+      if ((el.getAttribute('src') || '').indexOf('face_current.png') !== -1) {
+        el.setAttribute('src', faceMaskedStep1);
+      }
+    });
+    console.log('[AIMY report] Step1完了, 顔マスク:', faceMaskedStep1 !== raw ? '使用' : '未使用（元写真）');
+  })();
+  </script>
+
+  <script src="config.js"></script>
+  <script>
+  // ═══ DOCTORS COSME AI RECOMMENDATIONS ═══
+  (function () {
+    var CATALOG = [
+      {n:"ハイドレーティングクレンザー",b:"ZO SKIN HEALTH",i:"グリセリン / ヒアルロン酸Na / パンテノール",d:"普通肌〜乾燥肌向けクリームタイプ洗顔料。保湿重視でセラピューティック治療中のサポートにも。",p:"6,820円（税込）",s:"乾燥+2 / 敏感+2",c:"初回対面必須"},
+      {n:"ジェントルクレンザー",b:"ZO SKIN HEALTH",i:"コカミドプロピルベタイン / グリセリン / アラントイン",d:"全肌質対応ジェルタイプ洗顔料。混合肌〜普通肌向け低刺激設計。",p:"6,820円（税込）",s:"毛穴+2 / くすみ+2",c:"初回対面必須"},
+      {n:"エクスフォリエーティングクレンザー",b:"ZO SKIN HEALTH",i:"サリチル酸 / カプセル化ビタミンE / マイクロビーズ",d:"脂性肌・毛穴・ニキビ向けジェル洗顔料。サリチル酸で毛穴皮脂にアプローチ。",p:"6,820円（税込）",s:"毛穴+3 / ニキビ+3 / 皮脂+3",c:"初回対面必須"},
+      {n:"バランサートナー",b:"ZO SKIN HEALTH",i:"アロエベラ / ハマメリス / 乳酸",d:"洗顔後の肌pHを整えアクティブ製品の浸透を高める拭き取り化粧水。",p:"7,700円（税込）",s:"毛穴+2 / キメ+2",c:"初回対面必須"},
+      {n:"イルミネーティングAOXセラム",b:"ZO SKIN HEALTH",i:"ZOX¹²®複合体 / ビタミンC / ビタミンE",d:"朝用抗酸化美容液。環境ダメージから肌を守り日中のくすみ・酸化ストレスを軽減。",p:"24,200円（税込）",s:"くすみ+3 / 光老化+3 / ハリ+2",c:"初回対面必須"},
+      {n:"シーセラム（10% Vitamin C Self-Activating）",b:"ZO SKIN HEALTH",i:"アスコルビン酸10% / ビタミンE / フィトリピッド",d:"自己活性化型ビタミンC10%美容液。シミ・くすみ予防、ハリ感、明るいトーンへ導く。",p:"18,700円（税込/50mL）",s:"シミ+3 / くすみ+4 / ハリ+3",c:"初回対面必須"},
+      {n:"ブライタライブ",b:"ZO SKIN HEALTH",i:"アルブチン / 乳酸 / ペプチド",d:"HQ・レチノール不使用のブライトニング美容液。長期使用で穏やかにシミ・肝斑・くすみをケア。",p:"20,900円（税込/50mL）",s:"シミ+3 / 肝斑+3 / くすみ+3",c:"初回対面必須"},
+      {n:"デイリーPD（デイリーパワーディフェンス）",b:"ZO SKIN HEALTH",i:"パルミチン酸レチノール / DNA修復酵素 / ZO-RRS²®",d:"光老化修復・予防、ハリ・キメ改善。エイジングケアのデイリースタンダード。",p:"21,780円（税込/60mL）",s:"小じわ+3 / ハリ+3 / 毛穴+3 / 光老化+3",c:"初回対面必須"},
+      {n:"RCクリーム（リペア&コントロールクリーム）",b:"ZO SKIN HEALTH",i:"パルミチン酸レチノール / セラミド / DNA修復酵素",d:"乾燥肌向けにセラミド配合を強化。光老化ケア・しわ・ハリ改善。",p:"15,400円（税込/50mL）",s:"小じわ+3 / 乾燥+3 / ハリ+3",c:"初回対面必須"},
+      {n:"Wテクスチャーリペア",b:"ZO SKIN HEALTH",i:"レチノール0.5% / ZCORE™ / ZPRO®",d:"高濃度レチノール0.5%美容クリーム。ハリ・たるみ改善、コラーゲン・ヒアルロン酸生成サポート。",p:"22,000円（税込/50mL）",s:"小じわ+4 / 毛穴+4 / ハリ+4 / たるみ+3",c:"初回対面必須"},
+      {n:"スキンブライセラム0.25",b:"ZO SKIN HEALTH",i:"レチノール0.25% / バクチオール / グルタチオン",d:"レチノール入門濃度。色調・シミ・くすみのケアとアンチエイジングを同時に狙う。",p:"11,880円（税込）",s:"シミ+2 / くすみ+2 / 小じわ+2",c:"初回対面必須"},
+      {n:"スキンブライセラム1.0",b:"ZO SKIN HEALTH",i:"レチノール1.0% / バクチオール / グルタチオン",d:"シリーズ最高濃度。深いシミ・色素沈着・光老化対策の中〜上級者向け。",p:"18,700円（税込/50mL）",s:"シミ+4 / 色素沈着+4 / 小じわ+4",c:"初回対面必須"},
+      {n:"ファーミングセラム",b:"ZO SKIN HEALTH",i:"レチノール / ペプチド複合体 / 抗酸化成分",d:"たるみ・ハリ低下に特化。フェイスラインのリフトアップ・キメ改善を狙う最高価格帯。",p:"32,560円（税込/47mL）",s:"たるみ+4 / ハリ+4 / 小じわ+4",c:"初回対面必須"},
+      {n:"ハイドラファーム",b:"ZO SKIN HEALTH",i:"レチノール / ペプチド / 植物エキス",d:"目元専用アイクリーム。クマ・くすみ・小じわ・ハリ低下にアプローチ。",p:"20,460円（税込/15mL）",s:"目元のクマ+3 / 目元の小じわ+3 / ハリ+3",c:"初回対面必須"},
+      {n:"サンスクリーン+プライマー SPF30",b:"ZO SKIN HEALTH",i:"酸化チタン / 酸化亜鉛 / メラニン",d:"ノンケミカル化粧下地兼日焼け止め。UVA/UVB+ブルーライト+近赤外線を広帯域カット。",p:"8,360円（税込/30mL）",s:"光老化+3 / 日焼け+3 / シミ予防+3",c:"初回対面必須"},
+      {n:"BSサンスクリーンSPF50",b:"ZO SKIN HEALTH",i:"酸化亜鉛 / 酸化チタン / ビタミンE",d:"SPF50・PA++++の高防御日焼け止め。ノンケミカル系で高SPFを実現。",p:"12,320円（税込）",s:"日焼け+4 / 光老化+4 / シミ予防+4",c:"初回対面必須"},
+      {n:"シエスタ フェイスセラム（C-ESTA フェイスセラム）",b:"JAN MARINI",i:"パルミチン酸アスコルビル7% / DMAE / ビタミンB5・E",d:"脂溶性ビタミンC7%とDMAE高濃度配合。リフトアップ・たるみ・小じわ・くすみをケア。",p:"15,840円（税込/30mL）",s:"たるみ+3 / ハリ+3 / 小じわ+3 / くすみ+2",c:"オンライン診察"},
+      {n:"RGブースター（フェイスローションブースター）",b:"JAN MARINI",i:"成長因子 / ヒアルロン酸 / ペプチド",d:"成長因子配合リペアブースター。ターンオーバー活性化・施術後の肌再生サポート。",p:"35,310円（税込）",s:"ハリ+4 / 再生+4 / 小じわ+3",c:"オンライン診察"},
+      {n:"レチノプラス フェイスクリーム（AIV プラス）",b:"JAN MARINI",i:"オールトランスレチノール / グリコール酸 / ペプチド",d:"オールトランスレチノール+グリコール酸+ペプチド配合エイジングケアクリーム。低刺激でデイリー使用可。",p:"16,940円（税込/28mL）",s:"小じわ+3 / シミ+3 / キメ+3",c:"オンライン診察"},
+      {n:"ルミネート フェイスローション",b:"JAN MARINI",i:"オールトランスレチノール / アンチエイジングペプチド / ブライトニング複合体",d:"HQフリーのブライトニング+エイジングケア。シミ・色素沈着・くすみを多角的にケア。",p:"18,480円（税込/30mL）",s:"シミ+3 / 肝斑+3 / くすみ+3 / 小じわ+3",c:"オンライン診察"},
+      {n:"マリーニ ペプチド美容液（AIV エクストリーム）",b:"JAN MARINI",i:"パルミトイルテトラペプチド-7 / パルミトイルトリペプチド-1 / ミリストイルペンタペプチド",d:"5種類のペプチド高配合。ハリ・キメ・うるおい・バリア機能を多角的にサポート。鎮静と修復寄り。",p:"20,570円（税込/30mL）",s:"ハリ+3 / キメ+3 / 乾燥+3",c:"オンライン診察"},
+      {n:"ハイラ フェイスセラム（Hyla3D™）",b:"JAN MARINI",i:"マルチサイズヒアルロン酸 / HAブースター",d:"5種類のヒアルロン酸+HAブースターで深い乾燥・ハリ低下・キメの乱れにマルチレイヤーで作用。",p:"18,150円（税込/30mL）",s:"乾燥+4 / ハリ+3 / キメ+3",c:"オンライン診察"},
+      {n:"マリーニ フェイスクリーム（TF）",b:"JAN MARINI",i:"TGF-β1 / Thymosin beta 4 / アンチエイジングペプチド",d:"成長因子TGF-β1配合の次世代エイジングクリーム。コラーゲン・エラスチン生成を促進。",p:"21,450円（税込）",s:"ハリ+4 / 小じわ+3 / たるみ+3",c:"オンライン診察"},
+      {n:"ロザリーブ フェイスローション（Rosalieve™ RRC）",b:"JAN MARINI",i:"テトラペプチド-14 / アゼライン酸誘導体 / ペプチド複合体",d:"慢性的な赤み・酒さ・敏感肌に特化。炎症性サイトカインを抑制し毛細血管拡張をコントロール。",p:"14,300円（税込/30mL）",s:"赤み+4 / 酒さ+4 / 敏感+3",c:"オンライン診察"},
+      {n:"マリーニ サンスクリーン SPF45（Tinted）",b:"JAN MARINI",i:"酸化亜鉛 / 酸化チタン / 抗酸化複合体",d:"ノンケミカルティント日焼け止め。SPF45で抗酸化ケアも同時。化粧下地としても優秀。",p:"8,580円（税込/57g）",s:"日焼け+3 / 光老化+3 / シミ予防+3",c:"オンライン診察"},
+      {n:"D・E・J face cream",b:"REVISION SKINCARE",i:"アセチルテトラペプチド-2 / パルミトイルヘキサペプチド-14 / α-グルカンオリゴサッカリド",d:"真皮表皮接合部（DEJ）にアプローチ。シワ・たるみ・キメの乱れに包括対応。日中夜兼用。",p:"20,900円（48g）",s:"シミ+3 / 小じわ+4 / たるみ+4 / 毛穴+3",c:"カウンセリング必須"},
+      {n:"D・E・J Night face cream",b:"REVISION SKINCARE",i:"レチノール / ニコチンアミド / ペプチド",d:"夜用DEJクリーム。レチノール+ナイアシンアミドで夜間の肌再生・ターンオーバーをサポート。",p:"21,780円（48g）",s:"シミ+3 / 小じわ+4 / くすみ+4 / たるみ+3",c:"カウンセリング必須"},
+      {n:"C+ Correcting Complex 30%",b:"REVISION SKINCARE",i:"30%THDアスコルビン酸 / α-リポ酸 / CoQ10",d:"高濃度30%安定型ビタミンCセラム。シミ・くすみ・光老化・小じわに多角的にアプローチ。",p:"21,780円（30mL）",s:"シミ+5 / くすみ+5 / 小じわ+3 / 赤み+2",c:"カウンセリング必須"},
+      {n:"Revox Skin Smoothing Serum",b:"REVISION SKINCARE",i:"8種類のペプチド / GABA / ヒアルロン酸",d:"「塗るボトックス」。8種ペプチド+GABAで表情ジワに即効アプローチ。眉間・目尻・額向け。",p:"27,280円（30mL）",s:"小じわ+5 / 表情ジワ+5 / ハリ+3",c:"カウンセリング必須"},
+      {n:"Nectifirm Advanced",b:"REVISION SKINCARE",i:"8種類のペプチド / リンゴンベリー果実エキス / 紅藻エキス",d:"ネック・デコルテ専用クリーム。首のシワ・たるみ・色素沈着に特化した医療用クリーム。",p:"20,900円（50g）",s:"たるみ+5 / 首のシワ+5 / くすみ+3",c:"カウンセリング必須"},
+      {n:"Intellishade TruPhysical C",b:"REVISION SKINCARE",i:"100%ミネラル系UV成分 / ビタミンC（THDアスコルビン酸） / ペプチド",d:"SPF45のノンケミカル多機能デイクリーム。1本でスキンケア・UV・色補正をカバー。",p:"11,440円（48g）",s:"シミ+4 / くすみ+3 / 赤み+2 / 光老化+5",c:"カウンセリング必須"},
+      {n:"A Advanced 0.5",b:"REVISION SKINCARE",i:"純粋レチノール0.5% / バクチオール / ペプチド",d:"安定型レチノール0.5%夜用セラム。バクチオール組み合わせで刺激を抑えながら高効果。",p:"15,180円（30mL）",s:"小じわ+4 / 毛穴+4 / くすみ+3 / ハリ+3",c:"カウンセリング必須"},
+      {n:"A Advanced 1.0",b:"REVISION SKINCARE",i:"純粋レチノール1.0% / バクチオール / ペプチド",d:"高濃度レチノール1.0%。シワ・毛穴・色素沈着に強力アプローチ。経験者向け。",p:"18,700円（30mL）",s:"小じわ+5 / 毛穴+5 / くすみ+4 / ハリ+4",c:"カウンセリング必須"},
+      {n:"HA HydraSerum+",b:"REVISION SKINCARE",i:"5種類のヒアルロン酸 / ペプチド / プレバイオティクス",d:"5種類の分子量の異なるHAで表層から深層まで多層保湿。乾燥小じわ・敏感肌・レチノール導入期に。",p:"14,300円（30mL）",s:"乾燥+5 / 小じわ+3 / 敏感肌+3",c:"カウンセリング必須"},
+      {n:"TAホワイトローションn",b:"NAVISION DR",i:"トラネキサム酸 / 4-メトキシサリチル酸カリウム塩（4MSK） / ヒアルロン酸Na",d:"2つの美白有効成分配合の薬用美白化粧水。メラニン生成を抑えシミ・そばかすを防ぐ。",p:"7,150円（150mL）",s:"シミ+3 / くすみ+3 / 肌荒れ+2",c:"誰でも購入可"},
+      {n:"TAホワイトエッセンス",b:"NAVISION DR",i:"トラネキサム酸 / 4MSK / ヒアルロン酸Na",d:"TAホワイトシリーズの薬用美白美容液。2つの美白有効成分を高濃度配合した集中ケア。",p:"11,000円（45mL）",s:"シミ+4 / くすみ+3 / 肌荒れ+2",c:"誰でも購入可"},
+      {n:"TAホワイトエマルジョンII n",b:"NAVISION DR",i:"トラネキサム酸 / 4MSK / ヒアルロン酸Na",d:"しっとりタイプの薬用美白乳液。乾燥肌・冬場・エイジング世代向け。美白と保湿を両立。",p:"9,350円（100mL）",s:"シミ+3 / 乾燥+4 / くすみ+3",c:"誰でも購入可"},
+      {n:"TAクリームAAn",b:"NAVISION DR",i:"トラネキサム酸 / 酢酸DL-α-トコフェロール / リピジュア",d:"薬用美白クリーム。シミ・そばかす予防に加え肌荒れ防止・血行促進にも働く仕上げクリーム。",p:"17,600円（30g）",s:"シミ+3 / 乾燥+4 / 肌荒れ+3",c:"誰でも購入可"},
+      {n:"TAバリアローション",b:"NAVISION DR",i:"トラネキサム酸 / グリチルリチン酸ジカリウム / ヒアルロン酸Na",d:"肌荒れ・敏感肌対策の薬用化粧水。レーザー治療後や敏感期の肌にも使いやすい低刺激処方。",p:"4,620円（120mL）",s:"肌荒れ+4 / 赤み+3 / シミ+2",c:"誰でも購入可"},
+      {n:"TAバリアクリーム",b:"NAVISION DR",i:"トラネキサム酸 / グリチルリチン酸ジカリウム / リピジュア",d:"敏感肌向け薬用クリーム。肌荒れ防止・美白・血行促進をケア。敏感肌・乾燥肌・術後肌向け。",p:"8,800円（25g）",s:"肌荒れ+4 / 乾燥+4 / 赤み+3",c:"誰でも購入可"},
+      {n:"TAレチノファースト",b:"NAVISION DR",i:"純粋レチノール / トラネキサム酸 / 酢酸DL-α-トコフェロール",d:"レチノール初心者向け薬用美白×シワ改善クリーム。A反応を抑えながら段階的に慣らせる設計。",p:"9,900円（18g）",s:"小じわ+3 / シミ+3 / 毛穴+2",c:"誰でも購入可"},
+      {n:"TAレチノアドバンス",b:"NAVISION DR",i:"純粋レチノール（高配合） / トラネキサム酸 / 酢酸DL-α-トコフェロール",d:"レチノファーストからのステップアップ。高配合レチノールで深い乾燥小じわ・キメ・毛穴・ハリ低下に多角的アプローチ。",p:"14,300円（15g）",s:"小じわ+4 / 毛穴+3 / シミ+3 / ハリ+3",c:"誰でも購入可"},
+      {n:"モイストプロテクトUV",b:"NAVISION DR",i:"紫外線吸収剤 / 保湿成分 / SPF50・PA++++",d:"医療機関専売の保湿型日焼け止め。SPF50・PA++++の高防御と高保湿を両立。",p:"3,520円（30mL）",s:"光老化+4 / 乾燥+3",c:"誰でも購入可"},
+      {n:"TAホワイトプロテクトUV",b:"NAVISION DR",i:"トラネキサム酸 / 紫外線散乱剤・吸収剤 / SPF50・PA++++",d:"薬用美白成分配合の日焼け止め。UV防御と同時に美白ケアができる通年使い向け。",p:"4,400円（30mL）",s:"シミ+4 / 光老化+4 / くすみ+3",c:"誰でも購入可"},
+      {n:"TAマイルドプロテクトUV",b:"NAVISION DR",i:"紫外線散乱剤 / 保湿成分 / SPF50・PA++++",d:"ノンケミカル処方の日焼け止め。敏感肌・術後肌でも使える低刺激設計。SPF50・PA++++。",p:"3,960円（30mL）",s:"光老化+4 / 敏感肌+3",c:"誰でも購入可"},
+      {n:"TPNa ローション MD",b:"plus RESTORE",i:"TPNa（トコフェロールリン酸ナトリウム） / グリチルリチン酸ジカリウム",d:"薬用化粧水。レーザー・光治療後のホームケア用。敏感期の肌でも使える低刺激設計。",p:"5,280円（100mL）",s:"肌荒れ+3 / 赤み+3 / ニキビ+3",c:"誰でも購入可"},
+      {n:"ナノHQクリーム（10g）",b:"plus RESTORE",i:"ハイドロキノン1.9% / フラーレン / ビタミンC・E",d:"ナノ化技術で安定化したHQ1.9%薬用クリーム。シミ・色素沈着・肝斑の集中ケア。",p:"3,300円（10g）",s:"シミ+5 / 色素沈着+5 / くすみ+4",c:"誰でも購入可"},
+      {n:"ナノHQクリーム EX",b:"plus RESTORE",i:"ハイドロキノン4% / フラーレン / グリチルリチン酸2K",d:"高濃度HQ4%の上位ライン。頑固なシミ・濃い色素沈着のスポット集中ケア用。",p:"2,200円（5g）",s:"シミ+5 / 色素沈着+5 / 肝斑+4",c:"誰でも購入可"},
+      {n:"TAホワイトセラム MD",b:"plus RESTORE",i:"トラネキサム酸2% / 保湿成分",d:"トラネキサム酸2%配合の薬用美白セラム。肝斑・くすみ・色素沈着の広範囲ケアに最適。",p:"5,500円（50mL）",s:"シミ+3 / 肝斑+4 / くすみ+3",c:"誰でも購入可"},
+      {n:"RAクリーム",b:"plus RESTORE",i:"レチノイン酸トコフェリル / ビタミンA誘導体",d:"レチノイド系薬用クリーム。シワ・キメの乱れ・毛穴ケアに対応。",p:"4,950円（20g）",s:"小じわ+4 / 毛穴+3 / ハリ+3",c:"誰でも購入可"},
+      {n:"アミノシナジー",b:"plus RESTORE",i:"アミノ酸複合体 / ヒアルロン酸 / 保湿成分",d:"高濃度アミノ酸配合エイジングケア美容液。ハリ・うるおい・キメを整えるプレミアムライン。",p:"11,550円（100mL）",s:"乾燥+5 / ハリ+4 / キメ+4",c:"誰でも購入可"},
+      {n:"UVローション",b:"plus RESTORE",i:"フラーレン / 紫外線吸収剤 / SPF50+・PA++++",d:"フラーレン配合の抗酸化ケア兼日焼け止め。ウォータープルーフ・顔ボディ兼用。",p:"3,080円（30mL）",s:"光老化+4 / シミ+3",c:"誰でも購入可"},
+      {n:"UVミルク",b:"plus RESTORE",i:"紫外線散乱剤 / フラーレン / SPF30・PA++",d:"ノンケミカル日焼け止め。石けんで落とせる低刺激。敏感肌・施術後肌にも対応。",p:"3,080円（30g）",s:"光老化+3 / 敏感肌+3",c:"誰でも購入可"},
+      {n:"DT カモフラージュコンシーラー",b:"plus RESTORE",i:"カバー成分 / 保湿成分",d:"6色展開の治療直後専用コンシーラー。術後のかさぶた・赤み・内出血を自然にカバー。",p:"1,650円（2.7g）",s:"赤み+3 / 内出血カバー+5 / 色素沈着カバー+4",c:"誰でも購入可"}
+    ];
+
+    var STAR = '<svg viewBox="0 0 24 24" fill="{{c}}" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>';
+
+    function stars(n) {
+      var h = '';
+      for (var i = 0; i < 5; i++) h += STAR.replace('{{c}}', i < n ? '#f59e0b' : '#e2e8f0');
+      return h;
+    }
+
+    function escHtml(s) {
+      return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function renderCard(prod) {
+      var ingr = (prod.i || '').split('/').map(function (s) { return s.trim(); }).filter(Boolean);
+      var ingrHtml = ingr.map(function (s) { return '<span class="pc-tag ingredient">' + escHtml(s) + '</span>'; }).join('');
+      var cmap = { '誰でも購入可': '#22c55e', 'オンライン診察': '#f59e0b' };
+      var cc = cmap[prod.c] || '#d4425c';
+      return '<div class="pc lg rv">'
+        + '<div class="e"></div><div class="t"></div><div class="s"></div>'
+        + '<div class="c">'
+        + '<div class="pc-head"><div class="pc-name">' + escHtml(prod.n) + '</div></div>'
+        + '<div class="pc-brand">' + escHtml(prod.b) + ' ｜ ドクターズコスメ</div>'
+        + '<div class="pc-stars">' + stars(5) + '</div>'
+        + '<div>' + ingrHtml + '</div>'
+        + '<div class="pc-reason"><strong>あなたの肌との相性：</strong>' + escHtml(prod.r) + '</div>'
+        + '<div class="pc-price">' + escHtml(prod.p) + '</div>'
+        + '<div style="margin-top:8px"><span class="pc-tag" style="background:rgba(0,0,0,.03);color:' + cc + ';border-color:' + cc + '">' + escHtml(prod.c) + '</span></div>'
+        + '</div></div>';
+    }
+
+    // テンプレート表示用サンプル（Gemini API失敗時フォールバック）
+    var TEMPLATE = [
+      { n: 'シーセラム（10% Vitamin C Self-Activating）', r: 'シミ・くすみスコアの改善に特化した自己活性化型ビタミンC10%美容液。つけた瞬間から抗酸化力を発揮し、メラニン生成を抑制。くすみ・ハリ不足が気になる方に特におすすめです。' },
+      { n: 'TAホワイトエッセンス', r: 'トラネキサム酸×4MSKのダブル美白有効成分配合の薬用美容液。シミ・そばかすを防ぎながら毎日使える処方で、初めて美容コスメに取り組む方にも安心してお使いいただけます。' },
+      { n: 'ロザリーブ フェイスローション（Rosalieve™ RRC）', r: '赤み・敏感肌傾向が見られる方に特化した処方。炎症性サイトカインを抑制し、肌バリアを強化。施術後のホームケアとしても高い支持を受けているアイテムです。' },
+      { n: 'TAホワイトプロテクトUV', r: '薬用美白成分トラネキサム酸配合の日焼け止め。SPF50・PA++++のUV防御と同時に美白ケアができ、シミ予防を日常的に続けたい方に最適な一本です。' },
+      { n: 'デイリーPD（デイリーパワーディフェンス）', r: 'パルミチン酸レチノール×DNA修復酵素配合のデイリーエイジングケア。光老化修復・予防、ハリ・キメの改善をデイリーでサポートするZOスキンヘルスの代名詞的アイテムです。' }
+    ];
+
+    function showTemplate() {
+      var listEl = document.getElementById('cosmeList');
+      if (!listEl) return;
+      var cards = TEMPLATE.map(function (t) {
+        var prod = null;
+        for (var i = 0; i < CATALOG.length; i++) {
+          if (CATALOG[i].n === t.n) { prod = Object.assign({}, CATALOG[i]); break; }
+        }
+        if (!prod) return '';
+        prod.r = t.r;
+        return renderCard(prod);
+      }).join('');
+      listEl.innerHTML = cards;
+      if (typeof obs !== 'undefined') {
+        listEl.querySelectorAll('.rv').forEach(function (el) {
+          if (!el.classList.contains('v')) obs.observe(el);
+        });
+      }
+    }
+
+    function renderRecs(recs) {
+      var listEl = document.getElementById('cosmeList');
+      if (!listEl) return false;
+      var cards = recs.map(function (r) {
+        var prod = CATALOG[r.id];
+        if (!prod) return '';
+        prod = Object.assign({}, prod, { r: r.reason || '' });
+        return renderCard(prod);
+      }).filter(Boolean).join('');
+      if (!cards) return false;
+      listEl.innerHTML = cards;
+      if (typeof obs !== 'undefined') {
+        listEl.querySelectorAll('.rv').forEach(function (el) {
+          if (!el.classList.contains('v')) obs.observe(el);
+        });
+      }
+      return true;
+    }
+
+    function loadRecommendations() {
+      var listEl = document.getElementById('cosmeList');
+      if (!listEl) return;
+
+      // ① 分析時に保存したlocalStorageから直接表示（追加APIコール不要）
+      var storedRecs = null;
+      try { storedRecs = JSON.parse(localStorage.getItem('aimyCosmeRecs')); } catch (e) {}
+      if (Array.isArray(storedRecs) && storedRecs.length > 0) {
+        console.log('[AIMY cosme] localStorageから推薦を表示 ' + storedRecs.length + '件');
+        if (renderRecs(storedRecs)) return;
+      }
+
+      // ② localStorageにない場合のみAPIコール（クォータ節約のため極力使わない）
+      var apiKey = (window.AIMY_CONFIG || {}).GEMINI_API_KEY;
+      if (!apiKey) { console.warn('[AIMY cosme] APIキーなし → テンプレ表示'); showTemplate(); return; }
+
+      var analysis = null, chat = null;
+      try { analysis = JSON.parse(localStorage.getItem('aimyAnalysis')); } catch (e) {}
+      try { chat = JSON.parse(localStorage.getItem('aimyChatData')); } catch (e) {}
+      var concern = (chat || {}).concern || 'シミ・くすみ';
+
+      listEl.innerHTML = '<div style="text-align:center;padding:40px 16px"><div style="display:inline-flex;align-items:center;gap:10px;background:rgba(79,125,245,.06);border:1px solid rgba(79,125,245,.15);border-radius:20px;padding:12px 24px;font-size:13px;color:var(--navy);font-weight:500"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite;flex-shrink:0"><circle cx="12" cy="12" r="10" opacity=".25"/><path d="M12 2a10 10 0 0110 10"/></svg>AIがあなたの肌分析からコスメを選定中...</div></div>';
+
+      var shortCatalog = CATALOG.map(function (p, i) { return { id: i, name: p.n, concerns: p.s }; });
+      var skinSummary = analysis
+        ? ('お悩み:' + concern + ' 総合:' + (analysis.overall_score || '?')
+          + ' シミ:' + ((analysis.shimi || {}).score || '?')
+          + ' シワ:' + ((analysis.shiwa || {}).score || '?')
+          + ' 毛穴:' + ((analysis.keana || {}).score || '?')
+          + ' 赤み:' + ((analysis.akami || {}).score || '?')
+          + ' キメ:' + ((analysis.texture || {}).score || '?'))
+        : 'お悩み:' + concern;
+
+      var prompt = 'ドクターズコスメカタログ:\n' + JSON.stringify(shortCatalog)
+        + '\n\n患者: ' + skinSummary
+        + '\n\n最適な5製品を選び次のJSON配列のみ返してください（他テキスト不要）:\n[{"id":番号,"reason":"理由40字以内"},×5]';
+
+      console.log('[AIMY cosme] フォールバックAPIコール開始');
+      fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + apiKey, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.4, maxOutputTokens: 512 }
+        })
+      })
+      .then(function (res) { return res.json(); })
+      .then(function (json) {
+        if (json.error) { console.error('[AIMY cosme] APIエラー:', json.error.message); showTemplate(); return; }
+        var text = (((((json.candidates || [])[0] || {}).content || {}).parts || [])[0] || {}).text || '';
+        text = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+        var s = text.indexOf('['), e = text.lastIndexOf(']');
+        if (s === -1 || e === -1) { showTemplate(); return; }
+        var recs = null;
+        try { recs = JSON.parse(text.slice(s, e + 1)); } catch (err) { showTemplate(); return; }
+        if (!Array.isArray(recs) || !recs.length) { showTemplate(); return; }
+        // 次回のために保存
+        try { localStorage.setItem('aimyCosmeRecs', JSON.stringify(recs)); } catch(e) {}
+        if (!renderRecs(recs)) showTemplate();
+      })
+      .catch(function (err) { console.error('[AIMY cosme] fetchエラー:', err); showTemplate(); });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadRecommendations);
+    } else {
+      loadRecommendations();
+    }
+  })();
+  </script>
+
+  <script>
+  // ═══ BEFORE/AFTER SLIDER ═══
+  (function () {
+    function initSlider(wrapperId, rangeId, maxOpacity) {
+      maxOpacity = maxOpacity !== undefined ? maxOpacity : 1.0;
+      var wrap = document.getElementById(wrapperId);
+      var range = document.getElementById(rangeId);
+      if (!wrap || !range) return;
+      var after = wrap.querySelector('.ba-after');
+      if (!after) return;
+
+      function update() {
+        var v = range.value;
+        after.style.opacity = (v / 100) * maxOpacity;
+        range.style.background =
+          'linear-gradient(90deg, #4f7df5 ' + v + '%, #dde4ff ' + v + '%)';
+      }
+
+      range.addEventListener('input', update);
+      update();
+    }
+
+    function setup() {
+      initSlider('slider-shimi', 'range-shimi', 0.5);
+      initSlider('slider-keana', 'range-keana', 1.0);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', setup);
+    } else {
+      setup();
+    }
+  })();
+  </script>
+</body>
+
+</html>

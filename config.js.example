@@ -1,0 +1,22 @@
+// ═══════════════════════════════════════════════
+// AIMY 設定ファイル テンプレート
+//
+// ローカル開発時:
+//   cp config.js.example config.js
+//   config.js に実際のキーを入力して使う
+//   ※ config.js は .gitignore 済み（Git にコミットされない）
+//
+// 本番（Render）:
+//   config.js は不要。Render の環境変数に以下を設定する:
+//     GEMINI_API_KEY=AIzaSy...（実際のキー）
+//     API_BASE_URL=（空でよい。同一オリジンで動く）
+//   /config.js は Flask が環境変数から自動生成して配信する。
+// ═══════════════════════════════════════════════
+
+window.AIMY_CONFIG = {
+  // Google AI Studio でキーを取得: https://aistudio.google.com/app/apikey
+  GEMINI_API_KEY: 'ここにGeminiのキーを貼り付け',
+
+  // ローカル開発: '' のまま（同一オリジン /api/... に接続）
+  API_BASE_URL: ''
+};

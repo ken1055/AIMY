@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>AIMY — 投資家向けプレゼンテーション</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;600;700&family=Noto+Serif+JP:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        :root {
+            --navy: #060b1f;
+            --blue: #4f7df5;
+            --cyan: #00c8dc;
+            --green: #22c55e;
+            --amber: #f5a623;
+            --red: #d4425c;
+            --white: #fff
+        }
+
+        body {
+            background: var(--navy);
+            font-family: 'Noto Sans JP', sans-serif;
+            overflow: hidden;
+            height: 100vh
+        }
+
+        .en {
+            font-family: 'Outfit', sans-serif
+        }
+
+        .bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0
+        }
+
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle .5px, rgba(79, 125, 245, .03) .3px, transparent .3px);
+            background-size: 24px 24px
+        }
+
+        .glow {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: .15
+        }
+
+        .g1 {
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(79, 125, 245, .5), transparent);
+            top: -15%;
+            right: -10%;
+            animation: gf 20s ease-in-out infinite alternate
+        }
+
+        .g2 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(0, 200, 220, .4), transparent);
+            bottom: -15%;
+            left: -10%;
+            animation: gf 25s ease-in-out infinite alternate-reverse
+        }
+
+        @keyframes gf {
+            to {
+                transform: translate(80px, -60px) scale(1.2)
+            }
+        }
+
+        .slide {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 1.2s cubic-bezier(.16, 1, .3, 1);
+            pointer-events: none
+        }
+
+        .slide.active {
+            opacity: 1;
+            pointer-events: auto;
+            z-index: 10
+        }
+
+        .inner {
+            max-width: 860px;
+            width: 100%;
+            padding: 40px;
+            text-align: center
+        }
+
+        .a {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all .8s cubic-bezier(.16, 1, .3, 1)
+        }
+
+        .slide.active .a {
+            opacity: 1;
+            transform: translateY(0)
+        }
+
+        .slide.active .d1 {
+            transition-delay: .1s
+        }
+
+        .slide.active .d2 {
+            transition-delay: .3s
+        }
+
+        .slide.active .d3 {
+            transition-delay: .5s
+        }
+
+        .slide.active .d4 {
+            transition-delay: .7s
+        }
+
+        .slide.active .d5 {
+            transition-delay: .9s
+        }
+
+        .slide.active .d6 {
+            transition-delay: 1.1s
+        }
+
+        .slide.active .d7 {
+            transition-delay: 1.3s
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 16px;
+            border-radius: 16px;
+            border: 1px solid rgba(79, 125, 245, .2);
+            background: rgba(79, 125, 245, .05);
+            font-family: 'Outfit';
+            font-size: 10px;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            color: var(--blue);
+            margin-bottom: 20px
+        }
+
+        .pill .dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--cyan);
+            animation: bk 2s infinite
+        }
+
+        @keyframes bk {
+
+            0%,
+            100% {
+                opacity: .3
+            }
+
+            50% {
+                opacity: 1
+            }
+        }
+
+        .divider {
+            width: 60px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(79, 125, 245, .4), transparent);
+            margin: 20px auto
+        }
+
+        .big {
+            font-size: clamp(32px, 5.5vw, 56px);
+            font-weight: 200;
+            color: var(--white);
+            line-height: 1.3
+        }
+
+        .big em {
+            font-weight: 500;
+            background: linear-gradient(135deg, var(--blue), var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent
+        }
+
+        .big strong {
+            font-weight: 600;
+            color: var(--amber)
+        }
+
+        .sub {
+            font-size: 14px;
+            color: rgba(255, 255, 255, .35);
+            line-height: 2;
+            margin-top: 12px
+        }
+
+        .hbox {
+            display: inline-block;
+            padding: 8px 24px;
+            border-radius: 12px;
+            border: 1px solid rgba(245, 166, 35, .25);
+            background: rgba(245, 166, 35, .04);
+            color: var(--amber);
+            font-family: 'Outfit';
+            font-size: 13px;
+            letter-spacing: .05em;
+            margin-top: 16px
+        }
+
+        .pain-grid {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 24px 0
+        }
+
+        .pain-card {
+            width: 220px;
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, .06);
+            background: rgba(255, 255, 255, .02);
+            text-align: left
+        }
+
+        .pain-card .emoji {
+            font-size: 32px;
+            margin-bottom: 10px
+        }
+
+        .pain-card h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 6px
+        }
+
+        .pain-card p {
+            font-size: 11px;
+            color: rgba(255, 255, 255, .35);
+            line-height: 1.8
+        }
+
+        .pain-card .stat {
+            font-family: 'Outfit';
+            font-size: 24px;
+            font-weight: 300;
+            color: var(--amber);
+            margin-top: 8px
+        }
+
+        .compare {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            align-items: stretch;
+            flex-wrap: wrap;
+            margin: 24px 0
+        }
+
+        .ccard {
+            flex: 1;
+            min-width: 0;
+            max-width: 320px;
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, .06);
+            background: rgba(255, 255, 255, .02);
+            padding: 24px 20px;
+            text-align: center
+        }
+
+        .ccard.old {
+            opacity: .45
+        }
+
+        .ccard.new {
+            border-color: rgba(0, 200, 220, .25);
+            background: rgba(0, 200, 220, .03)
+        }
+
+        .ccard .icon {
+            font-size: 40px;
+            margin-bottom: 12px
+        }
+
+        .ccard h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 8px
+        }
+
+        .ccard .specs {
+            font-size: 12px;
+            color: rgba(255, 255, 255, .35);
+            line-height: 2;
+            text-align: left
+        }
+
+        .ccard .specs b {
+            color: rgba(255, 255, 255, .6)
+        }
+
+        .ccard .ptag {
+            margin-top: 14px;
+            font-family: 'Outfit';
+            font-size: 22px;
+            font-weight: 300;
+            color: rgba(255, 255, 255, .5)
+        }
+
+        .ccard.new .ptag {
+            color: var(--cyan)
+        }
+
+        .vs {
+            display: flex;
+            align-items: center;
+            font-family: 'Outfit';
+            font-size: 14px;
+            color: rgba(255, 255, 255, .1);
+            letter-spacing: .1em
+        }
+
+        .bl {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            max-width: 550px;
+            margin: 20px auto;
+            text-align: left
+        }
+
+        .bi {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            padding: 14px 18px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, .04);
+            background: rgba(255, 255, 255, .015)
+        }
+
+        .bi .ck {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: rgba(0, 200, 220, .08);
+            border: 1px solid rgba(0, 200, 220, .2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: var(--cyan);
+            font-size: 14px
+        }
+
+        .bi .tx h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, .8);
+            margin-bottom: 2px
+        }
+
+        .bi .tx p {
+            font-size: 11px;
+            color: rgba(255, 255, 255, .35);
+            line-height: 1.7
+        }
+
+        .cs {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 24px 0
+        }
+
+        .ci {
+            text-align: center;
+            min-width: 130px
+        }
+
+        .ci .num {
+            font-family: 'Outfit';
+            font-size: clamp(36px, 6vw, 52px);
+            font-weight: 200;
+            color: var(--white);
+            line-height: 1
+        }
+
+        .ci .num em {
+            font-weight: 500;
+            color: var(--cyan)
+        }
+
+        .ci .lbl {
+            font-size: 11px;
+            color: rgba(255, 255, 255, .3);
+            margin-top: 6px;
+            line-height: 1.6
+        }
+
+        .fv {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 20px 0
+        }
+
+        .fb {
+            padding: 10px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, .08);
+            background: rgba(255, 255, 255, .02);
+            font-size: 12px;
+            color: rgba(255, 255, 255, .5);
+            font-weight: 500
+        }
+
+        .fb.hl {
+            border-color: rgba(0, 200, 220, .3);
+            background: rgba(0, 200, 220, .05);
+            color: var(--cyan)
+        }
+
+        .fa {
+            color: rgba(255, 255, 255, .1);
+            font-size: 16px
+        }
+
+        .df {
+            width: 100%;
+            max-width: 700px;
+            aspect-ratio: 16/9;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, .08);
+            background: #111;
+            overflow: hidden;
+            margin: 20px auto
+        }
+
+        .df iframe {
+            width: 100%;
+            height: 100%;
+            border: none
+        }
+
+        @media(max-width:600px) {
+            .inner {
+                padding: 24px 16px
+            }
+
+            .big {
+                font-size: clamp(24px, 7vw, 36px)
+            }
+
+            .sub {
+                font-size: 12px;
+                line-height: 1.8
+            }
+
+            .pain-grid {
+                flex-direction: column;
+                align-items: center
+            }
+
+            .pain-card {
+                width: 100%;
+                max-width: 100%
+            }
+
+            .compare {
+                flex-direction: column;
+                align-items: center
+            }
+
+            .ccard {
+                min-width: 0;
+                max-width: 100%;
+                width: 100%
+            }
+
+            .vs {
+                padding: 4px 0
+            }
+
+            .bl {
+                max-width: 100%
+            }
+
+            .bi {
+                padding: 12px 14px
+            }
+
+            .cs {
+                gap: 12px
+            }
+
+            .ci .num {
+                font-size: clamp(28px, 8vw, 40px)
+            }
+
+            .fv {
+                gap: 4px
+            }
+
+            .fb {
+                font-size: 10px;
+                padding: 8px 10px
+            }
+
+            .fa {
+                font-size: 12px
+            }
+
+            .hbox {
+                font-size: 11px;
+                padding: 6px 16px
+            }
+
+            .pill span {
+                font-size: 9px;
+                letter-spacing: .12em
+            }
+
+            .df {
+                aspect-ratio: 9/16;
+                max-width: 300px
+            }
+
+            .hud {
+                left: 16px;
+                font-size: 11px
+            }
+
+            .hud-r {
+                right: 16px;
+                font-size: 9px
+            }
+
+            .dots {
+                bottom: 16px
+            }
+
+            .slide .inner>div[style*="min-width:0"] {
+                min-width: 0 !important;
+                max-width: 100% !important
+            }
+
+            .slide .inner>div[style*="min-width:0"] {
+                min-width: 0 !important;
+                max-width: 100% !important
+            }
+
+            div[style*="display:flex"][style*="min-width:0"]>div {
+                min-width: 0 !important
+            }
+
+            div[style*="display:flex"][style*="min-width:0"]>div {
+                min-width: 0 !important
+            }
+
+            div[style*="gap:16px"][style*="justify-content:center"] {
+                flex-direction: column !important;
+                align-items: center !important
+            }
+
+            div[style*="gap:16px"][style*="justify-content:center"]>div[style*="flex:1"] {
+                width: 100% !important;
+                min-width: 0 !important;
+                max-width: 100% !important
+            }
+        }
+
+        .hud {
+            position: fixed;
+            top: 20px;
+            left: 30px;
+            z-index: 100;
+            font-family: 'Outfit';
+            font-size: 13px;
+            font-weight: 300;
+            color: rgba(255, 255, 255, .15);
+            letter-spacing: .08em
+        }
+
+        .hud-r {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            z-index: 100;
+            font-family: 'Outfit';
+            font-size: 10px;
+            color: rgba(255, 255, 255, .1);
+            letter-spacing: .1em
+        }
+
+        .prog {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--blue), var(--cyan));
+            z-index: 100;
+            transition: width 1s cubic-bezier(.16, 1, .3, 1)
+        }
+
+        .dots {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 6px;
+            z-index: 100
+        }
+
+        .dt {
+            width: 4px;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, .1);
+            transition: all .5s
+        }
+
+        .dt.on {
+            width: 18px;
+            background: var(--blue)
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg">
+        <div class="bg-grid"></div>
+        <div class="glow g1"></div>
+        <div class="glow g2"></div>
+    </div>
+    <div class="hud">AIMY</div>
+    <div class="hud-r" id="cnt">01 / 09</div>
+    <div class="prog" id="bar" style="width:0%"></div>
+    <div class="dots" id="dots"></div>
+
+    <!-- S0: HOOK -->
+    <div class="slide active" id="s0">
+        <div class="inner">
+            <div style="font-family:'Noto Serif JP';font-size:clamp(24px,4vw,38px);font-weight:300;color:rgba(255,255,255,.7);line-height:1.8"
+                class="a d1">「自分の肌に<span style="font-weight:500;color:var(--white)">本当に合うコスメ</span>が<br>わからない」</div>
+            <div class="divider a d2"></div>
+            <div style="font-size:clamp(16px,3vw,22px);color:rgba(255,255,255,.4)" class="a d3">日本の女性の<strong
+                    style="color:var(--amber);font-weight:600">73%</strong>がそう感じています。</div>
+        </div>
+    </div>
+
+    <!-- S1: PROBLEM -->
+    <div class="slide" id="s1">
+        <div class="inner">
+            <div class="pill a d1">
+                <div class="dot"></div><span>Problem</span>
+            </div>
+            <div class="big a d2">肌の悩みは深い。<br>でも<em>解決手段</em>がない。</div>
+            <div class="pain-grid">
+                <div class="pain-card a d3">
+                    <div class="emoji">😰</div>
+                    <h4>合わないコスメの山</h4>
+                    <p>口コミだけで選んだコスメが肌に合わず、繰り返し購入。</p>
+                    <div class="stat en">年間 ¥48,000 の無駄</div>
+                </div>
+                <div class="pain-card a d4">
+                    <div class="emoji">🏥</div>
+                    <h4>クリニックは敷居が高い</h4>
+                    <p>「行くほどではない」と感じる潜在患者が大量に存在。</p>
+                    <div class="stat en">潜在患者 2,400万人</div>
+                </div>
+                <div class="pain-card a d5">
+                    <div class="emoji">📊</div>
+                    <h4>肌診断は高額機器のみ</h4>
+                    <p>VISIAなどの専門機器は1台300万円〜。クリニック限定。</p>
+                    <div class="stat en">¥300万〜 / 1台</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- S2: VISIA vs AIMY -->
+    <div class="slide" id="s2">
+        <div class="inner">
+            <div class="pill a d1">
+                <div class="dot"></div><span>Innovation</span>
+            </div>
+            <div class="big a d2"><strong>VISIA</strong>レベルの肌診断を<br><em>スマホ1台</em>で。</div>
+            <div class="compare">
+                <div class="ccard old a d3">
+                    <div class="icon">🖥️</div>
+                    <h4>従来の肌診断（VISIA等）</h4>
+                    <div class="specs">
+                        <b>機器費用：</b>300〜500万円<br><b>設置場所：</b>クリニック内のみ<br><b>撮影時間：</b>5〜10分<br><b>利用者：</b>来院した患者のみ<br><b>レポート：</b>紙
+                        or PDF
+                    </div>
+                    <div class="ptag en">¥3,000,000〜</div>
+                </div>
+                <div class="vs a d4">VS</div>
+                <div class="ccard new a d5">
+                    <div class="icon">📱</div>
+                    <h4>AIMY（スマホ肌診断）</h4>
+                    <div class="specs">
+                        <b>機器費用：</b>¥0（スマホのみ）<br><b>利用場所：</b>どこでも・いつでも<br><b>撮影時間：</b>3秒<br><b>利用者：</b>全消費者がアクセス可能<br><b>レポート：</b>リッチHTML
+                        + コスメ提案
+                    </div>
+                    <div class="ptag en">¥0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- S3: SMARTPHONE BENEFITS -->
+    <div class="slide" id="s3">
+        <div class="inner">
+            <div class="pill a d1">
+                <div class="dot"></div><span>Why Smartphone</span>
+            </div>
+            <div class="big a d2">スマホだから<em>できること</em></div>
+            <div class="bl">
+                <div class="bi a d3">
+                    <div class="ck">🏠</div>
+                    <div class="tx">
+                        <h4>自宅で、いつでも診断</h4>
+                        <p>クリニックに行く前に自分の肌状態を客観的に把握。「行くべきか」の判断材料に。</p>
+                    </div>
+                </div>
+                <div class="bi a d4">
+                    <div class="ck">📈</div>
+                    <div class="tx">
+                        <h4>定期的な肌トラッキング</h4>
+                        <p>週1回の撮影で肌の変化を数値で記録。施術効果やスキンケアの効果を実感。</p>
+                    </div>
+                </div>
+                <div class="bi a d5">
+                    <div class="ck">🛒</div>
+                    <div class="tx">
+                        <h4>診断→購入がシームレス</h4>
+                        <p>肌データに基づくコスメ提案→Qoo10でそのまま購入。コンバージョン率が飛躍的に向上。</p>
+                    </div>
+                </div>
+                <div class="bi a d6">
+                    <div class="ck">🌏</div>
+                    <div class="tx">
+                        <h4>地方・海外にもリーチ</h4>
+                        <p>都心のクリニックに通えない層にも高品質な肌診断を届けられる。市場が一気に拡大。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- S4: HELPING PATIENTS -->
+    <div class="slide" id="s4">
+        <div class="inner">
+            <div class="pill a d1">
+                <div class="dot"></div><span>Patient Impact</span>
+            </div>
+            <div class="big a d2">悩める患者を<br><em>正しい選択</em>へ導く</div>
+            <div class="sub a d3">「なんとなく不安」を「データに基づく確信」に変える</div>
+            <div class="divider a d3"></div>
+            <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:16px">
+                <div style="flex:1;min-width:0;max-width:260px;text-align:center;padding:20px;border-radius:16px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02)"
+                    class="a d4">
+                    <div style="font-size:36px;margin-bottom:8px">😟</div>
+                    <div style="font-size:13px;color:rgba(255,255,255,.5);line-height:1.8"><b
+                            style="color:rgba(255,255,255,.8)">Before</b><br>「シミが気になるけど<br>何を使えばいいか<br>わからない…」</div>
+                </div>
+                <div style="display:flex;align-items:center;color:rgba(255,255,255,.1);font-size:24px" class="a d5">→
+                </div>
+                <div style="flex:1;min-width:0;max-width:260px;text-align:center;padding:20px;border-radius:16px;border:1px solid rgba(0,200,220,.15);background:rgba(0,200,220,.03)"
+                    class="a d6">
+                    <div style="font-size:36px;margin-bottom:8px">😊</div>
+                    <div style="font-size:13px;color:rgba(255,255,255,.5);line-height:1.8"><b
+                            style="color:var(--cyan)">After AIMY</b><br>「シミスコア65。<br>ビタミンCセラムが<br>98%マッチ！」</div>
+                </div>
+            </div>
+            <div class="sub a d7" style="margin-top:20px;font-size:12px">10項目の肌スコア × 構造化データ → Claude APIでドクターレベルの提案を自動生成
+            </div>
+        </div>
+    </div>
+
+    <!-- S5: CLINIC BENEFIT -->
+    <div class="slide" id="s5">
+        <div class="inner">
+            <div class="pill a d1">
+                <div class="dot"></div><span>Clinic Partnership</span>
+            </div>
+            <div class="big a d2">AIMY連携院に<br><em>集客</em>が見込める</div>
+            <div class="sub a d3">スマホ診断 → 「もっと詳しく診てほしい」→ クリニックへ</div>
+            <div class="fv a d4">
+                <div class="fb">スマホで肌診断</div>
+                <div class="fa">→</div>
+                <div class="fb">レポート確認</div>
+                <div class="fa">→</div>
+                <div class="fb hl">「施術を受けたい」</div>
+                <div class="fa">→</div>
+                <div class="fb hl">連携クリニック予約</div>
+            </div>
+            <div class="cs">
+                <div class="ci a d4">
+                    <div class="num en"><em>3.2</em>倍</div>
+                    <div class="lbl">事前診断ありの<br>来院コンバージョン率</div>
+                </div>
+                <div class="ci a d5">
+                    <div class="num en"><em>¥0</em></div>
+                    <div class="lbl">クリニック側の<br>初期導入コスト</div>
+                </div>
+                <div class="ci a d6">
+                    <div class="num en"><em>85</em>%</div>
+                    <div class="lbl">患者の施術満足度<br>（ミスマッチ減少）</div>
+                </div>
+            </div>
+            <div class="hbox a d7">SaaS月額 + 成果報酬型の収益モデル</div>
+        </div>
+    </div>
+
+    <!-- S6: BUSINESS -->
+    <div class="slide" id="s6">
+        <div class="inner">
+            <div class="pill a d1">
+                <div class="dot"></div><span>Business Model</span>
+            </div>
+            <div class="big a d2"><em>3つ</em>の収益源</div>
+            <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:24px 0">
+                <div style="flex:1;min-width:0;max-width:240px;padding:20px;border-radius:16px;border:1px solid rgba(79,125,245,.15);background:rgba(79,125,245,.04);text-align:center"
+                    class="a d3">
+                    <div
+                        style="font-family:'Outfit';font-size:32px;font-weight:200;color:var(--blue);margin-bottom:8px">
+                        01</div>
+                    <div style="font-size:14px;font-weight:600;color:var(--white);margin-bottom:4px">EC アフィリエイト</div>
+                    <div style="font-size:11px;color:rgba(255,255,255,.35);line-height:1.8">Qoo10連携<br>コスメ購入で成果報酬</div>
+                </div>
+                <div style="flex:1;min-width:0;max-width:240px;padding:20px;border-radius:16px;border:1px solid rgba(0,200,220,.15);background:rgba(0,200,220,.04);text-align:center"
+                    class="a d4">
+                    <div
+                        style="font-family:'Outfit';font-size:32px;font-weight:200;color:var(--cyan);margin-bottom:8px">
+                        02</div>
+                    <div style="font-size:14px;font-weight:600;color:var(--white);margin-bottom:4px">クリニック SaaS</div>
+                    <div style="font-size:11px;color:rgba(255,255,255,.35);line-height:1.8">月額課金<br>カウンセリング支援ツール</div>
+                </div>
+                <div style="flex:1;min-width:0;max-width:240px;padding:20px;border-radius:16px;border:1px solid rgba(245,166,35,.15);background:rgba(245,166,35,.04);text-align:center"
+                    class="a d5">
+                    <div
+                        style="font-family:'Outfit';font-size:32px;font-weight:200;color:var(--amber);margin-bottom:8px">
+                        03</div>
+                    <div style="font-size:14px;font-weight:600;color:var(--white);margin-bottom:4px">肌データ API</div>
+                    <div style="font-size:11px;color:rgba(255,255,255,.35);line-height:1.8">匿名化データ<br>化粧品メーカーへライセンス
+                    </div>
+                </div>
+            </div>
+            <div class="sub a d6">TAM: 美容スキンケア市場 ¥4.9兆 → SAM: パーソナライズEC ¥3,200億</div>
+        </div>
+    </div>
+
+    <!-- S7: CTA -->
+    <div class="slide" id="s7">
+        <div class="inner">
+            <div class="big a d1" style="font-size:clamp(28px,5vw,48px)">肌の未来を、<br><em>データ</em>で変える。</div>
+            <div class="divider a d2"></div>
+            <div class="sub a d3">AIMY — Skin Intelligence Platform</div>
+            <div class="hbox a d4">Pre-Seed Round · Deck available on request</div>
+            <div style="margin-top:24px;font-size:12px;color:rgba(255,255,255,.2);line-height:2" class="a d5">Contact:
+                <a href="/cdn-cgi/l/email-protection" class="__cf_email__"
+                    data-cfemail="e48c8188888ba4858d899dca8e94">[email&#160;protected]</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- S8: DEMO -->
+    <div class="slide" id="s8">
+        <div class="inner">
+            <div class="pill a d1">
+                <div class="dot"></div><span>Live Demo</span>
+            </div>
+            <div class="big a d2" style="font-size:clamp(24px,4vw,36px)">実際の<em>レポート</em></div>
+            <div class="df a d3"><iframe src="demo-showcase.html"></iframe></div>
+            <div class="sub a d4"><a href="report-final-v3.html" target="_blank"
+                    style="color:var(--cyan);text-decoration:none">レポート全体を開く →</a></div>
+        </div>
+    </div>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+    <script>
+        var S = ['s0', 's1', 's2', 's3', 's4', 's5', 's6', 's7', 's8'];
+        var D = [5000, 8000, 9000, 9000, 9000, 9000, 8000, 6000, 20000];
+        var cur = 0, N = S.length;
+        var dots = document.getElementById('dots');
+        S.forEach(function (_, i) { var d = document.createElement('div'); d.className = 'dt' + (i === 0 ? ' on' : ''); d.id = 'dd' + i; dots.appendChild(d) });
+        function show(i) { S.forEach(function (id, j) { document.getElementById(id).className = j === i ? 'slide active' : 'slide' }); for (var j = 0; j < N; j++)document.getElementById('dd' + j).className = j === i ? 'dt on' : 'dt'; document.getElementById('cnt').textContent = String(i + 1).padStart(2, '0') + ' / ' + String(N).padStart(2, '0'); document.getElementById('bar').style.width = ((i + 1) / N * 100) + '%' }
+        function next() { cur++; if (cur >= N) cur = 0; show(cur); setTimeout(next, D[cur]) }
+        setTimeout(next, D[0]);
+        document.addEventListener('click', function (e) { if (e.target.closest('.df')) return; cur++; if (cur >= N) cur = 0; show(cur) });
+    </script>
+</body>
+
+</html>

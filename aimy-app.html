@@ -1,0 +1,2587 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AIMY</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Noto+Sans+JP:wght@200;300;400;500;600;700&family=Outfit:wght@200;300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    :root {
+      --navy: #0e1a4a;
+      --navy2: #162266;
+      --blue: #4f7df5;
+      --blue2: #7ba3ff;
+      --cyan: #00b8d4;
+      --text: #1a2240;
+      --text2: #3a4268;
+      --text3: #6b7194;
+      --text4: #9da2b8;
+      --white: #fff;
+      --serif: 'Cormorant Garamond', serif;
+      --sans: 'Outfit', 'Noto Sans JP', sans-serif;
+      --jp: 'Noto Sans JP', sans-serif;
+    }
+
+    html,
+    body {
+      height: 100%;
+      font-family: var(--sans);
+      color: var(--text);
+      overflow: hidden;
+      background: var(--white);
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%
+    }
+
+    /* ═══════════════════════
+   SCREEN SYSTEM
+   ═══════════════════════ */
+    .screen {
+      position: fixed;
+      inset: 0;
+      height: 100vh;
+      height: 100dvh;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .5s ease, transform .5s ease;
+      transform: translateX(40px)
+    }
+
+    .screen.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0);
+      z-index: 10
+    }
+
+    .screen.exit {
+      opacity: 0;
+      transform: translateX(-40px);
+      pointer-events: none
+    }
+
+    /* ═══════════════════════
+   LIQUID GLASS
+   ═══════════════════════ */
+    .lg {
+      position: relative;
+      overflow: hidden
+    }
+
+    .lg>.e {
+      position: absolute;
+      z-index: 0;
+      inset: -20px;
+      backdrop-filter: blur(3px);
+      filter: url(#glass-distortion);
+      overflow: hidden;
+      isolation: isolate
+    }
+
+    .lg>.t {
+      z-index: 1;
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, .22)
+    }
+
+    .lg>.s {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      overflow: hidden;
+      box-shadow: inset 2px 2px 1px 0 rgba(255, 255, 255, .5), inset -1px -1px 1px 1px rgba(255, 255, 255, .4)
+    }
+
+    .lg>.c {
+      position: relative;
+      z-index: 3
+    }
+
+    /* ═══════════════════════════════════
+   SCREEN 1: TOP PAGE (v5 embedded)
+   ═══════════════════════════════════ */
+    #top {
+      overflow-y: auto;
+      overflow-x: hidden;
+      background: var(--white)
+    }
+
+    /* NAV */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 18px 40px;
+      transition: all .5s
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 0 auto
+    }
+
+    .nav.scrolled {
+      backdrop-filter: blur(20px);
+      background: rgba(255, 255, 255, .65);
+      box-shadow: 0 1px 0 rgba(0, 0, 0, .04)
+    }
+
+    .nav-brand {
+      font-family: var(--serif);
+      font-weight: 600;
+      font-size: 26px;
+      letter-spacing: .04em;
+      color: var(--white);
+      transition: color .5s
+    }
+
+    .nav.scrolled .nav-brand {
+      color: var(--navy)
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      align-items: center
+    }
+
+    .nav-links a {
+      font-size: 12px;
+      color: rgba(255, 255, 255, .7);
+      text-decoration: none;
+      letter-spacing: .06em;
+      font-weight: 400;
+      transition: all .4s;
+      text-transform: uppercase
+    }
+
+    .nav.scrolled .nav-links a {
+      color: var(--text3)
+    }
+
+    .nav-links a:hover {
+      color: var(--white)
+    }
+
+    .nav.scrolled .nav-links a:hover {
+      color: var(--navy)
+    }
+
+    .nav-cta-link {
+      padding: 10px 24px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--white);
+      background: rgba(255, 255, 255, .12);
+      border: 1px solid rgba(255, 255, 255, .25);
+      cursor: pointer;
+      transition: all .4s;
+      text-decoration: none;
+      backdrop-filter: blur(8px)
+    }
+
+    .nav.scrolled .nav-cta-link {
+      color: var(--navy);
+      background: rgba(14, 26, 74, .04);
+      border-color: rgba(14, 26, 74, .12)
+    }
+
+    .nav-cta-link:hover {
+      background: rgba(255, 255, 255, .25)
+    }
+
+    .nav.scrolled .nav-cta-link:hover {
+      background: var(--navy);
+      color: var(--white)
+    }
+
+    /* HERO */
+    .hero {
+      position: relative;
+      height: 100vh;
+      min-height: 900px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden
+    }
+
+    .hero-video {
+      position: absolute;
+      inset: 0;
+      z-index: 0
+    }
+
+    .hero-video video,
+    .hero-video img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: linear-gradient(180deg, rgba(14, 26, 74, .3) 0%, rgba(14, 26, 74, .15) 40%, rgba(14, 26, 74, .2) 70%, rgba(14, 26, 74, .5) 100%)
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 0 24px;
+      max-width: 700px
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--white);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+      overflow: hidden;
+      position: relative;
+      animation: fadeUp .8s ease both
+    }
+
+    .hero-badge>.e {
+      border-radius: 20px
+    }
+
+    .hero-badge>.t {
+      border-radius: 20px;
+      background: rgba(255, 255, 255, .1)
+    }
+
+    .hero-badge>.s {
+      border-radius: 20px;
+      box-shadow: inset 1px 1px 1px rgba(255, 255, 255, .3), inset -1px -1px 1px rgba(255, 255, 255, .15)
+    }
+
+    .hero-badge .inner {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .hero-badge .pulse {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--cyan);
+      animation: blink 2s ease-in-out infinite
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .3
+      }
+    }
+
+    .hero h1 {
+      font-family: var(--serif);
+      font-size: clamp(48px, 8vw, 96px);
+      font-weight: 300;
+      line-height: 1.05;
+      letter-spacing: .01em;
+      color: var(--white);
+      margin-bottom: 16px;
+      animation: fadeUp .8s ease .15s both
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      font-weight: 400
+    }
+
+    .hero-sub {
+      font-family: var(--jp);
+      font-size: 15px;
+      font-weight: 300;
+      color: rgba(255, 255, 255, .7);
+      line-height: 2;
+      margin-bottom: 36px;
+      animation: fadeUp .8s ease .25s both;
+      letter-spacing: .04em
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeUp .8s ease .35s both
+    }
+
+    .btn-primary {
+      padding: 16px 40px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--navy);
+      background: var(--white);
+      border: none;
+      cursor: pointer;
+      transition: all .4s;
+      letter-spacing: .04em;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--jp)
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, .15)
+    }
+
+    .btn-primary svg {
+      transition: transform .3s
+    }
+
+    .btn-primary:hover svg {
+      transform: translateX(3px)
+    }
+
+    .btn-ghost {
+      padding: 16px 40px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--white);
+      border: none;
+      cursor: pointer;
+      transition: all .4s;
+      letter-spacing: .04em;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--jp);
+      position: relative;
+      overflow: hidden;
+      background: transparent
+    }
+
+    .btn-ghost>.e {
+      border-radius: 12px
+    }
+
+    .btn-ghost>.t {
+      border-radius: 12px;
+      background: rgba(255, 255, 255, .08)
+    }
+
+    .btn-ghost>.s {
+      border-radius: 12px;
+      box-shadow: inset 1px 1px 1px rgba(255, 255, 255, .2), inset -1px -1px 1px rgba(255, 255, 255, .1)
+    }
+
+    .btn-ghost .inner {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .btn-ghost:hover {
+      transform: translateY(-2px)
+    }
+
+    @keyframes fadeUp {
+      0% {
+        opacity: 0;
+        transform: translateY(20px)
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+
+    /* HERO SLIDE ROTATION */
+    .hero-slides {
+      position: relative;
+      min-height: 220px
+    }
+
+    .hero-slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity .8s cubic-bezier(.16, 1, .3, 1), transform .8s cubic-bezier(.16, 1, .3, 1);
+      pointer-events: none
+    }
+
+    .hero-slide.active {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+      position: relative
+    }
+
+    .hero-slide .hs-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(79, 125, 245, .25);
+      background: rgba(79, 125, 245, .08);
+      font-size: 9px;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: rgba(79, 125, 245, .9);
+      margin-bottom: 16px;
+      font-family: var(--en)
+    }
+
+    .hero-slide .hs-badge .dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--cyan);
+      animation: blink 2s infinite
+    }
+
+    .hero-slide .hs-title {
+      font-family: var(--serif);
+      font-size: clamp(28px, 6vw, 52px);
+      font-weight: 300;
+      color: var(--white);
+      line-height: 1.2;
+      margin-bottom: 12px
+    }
+
+    .hero-slide .hs-title em {
+      font-weight: 500;
+      font-style: italic;
+      background: linear-gradient(135deg, #4f7df5, #00c8dc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent
+    }
+
+    .hero-slide .hs-title strong {
+      font-weight: 600;
+      color: #f5a623
+    }
+
+    .hero-slide .hs-desc {
+      font-size: 14px;
+      color: rgba(255, 255, 255, .55);
+      line-height: 2;
+      letter-spacing: .03em;
+      max-width: 500px
+    }
+
+    .hero-slide .hs-stat {
+      font-family: var(--en);
+      font-size: clamp(40px, 8vw, 64px);
+      font-weight: 200;
+      color: var(--white);
+      line-height: 1;
+      margin: 8px 0
+    }
+
+    .hero-slide .hs-stat em {
+      font-weight: 500;
+      background: linear-gradient(135deg, #4f7df5, #00c8dc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent
+    }
+
+    .hero-slide .hs-stat strong {
+      color: #f5a623;
+      font-weight: 500
+    }
+
+    .hero-dots {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      margin: 20px 0 28px
+    }
+
+    .hero-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, .15);
+      transition: all .4s;
+      cursor: pointer
+    }
+
+    .hero-dot.on {
+      width: 20px;
+      background: rgba(79, 125, 245, .8)
+    }
+
+    .hero-scroll {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      animation: fadeUp .8s ease .5s both
+    }
+
+    .hero-scroll span {
+      font-size: 9px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, .4)
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 32px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, .4), transparent);
+      animation: scrollPulse 2s ease-in-out infinite
+    }
+
+    @keyframes scrollPulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scaleY(1)
+      }
+
+      50% {
+        opacity: .3;
+        transform: scaleY(.6)
+      }
+    }
+
+    /* SECTIONS */
+    .section-light {
+      background: linear-gradient(170deg, #fff 0%, #f6f7fc 20%, #eef0f8 40%, #e4e8f4 60%, #dde2f0 75%, #e8ecf6 90%, #f4f5fb 100%);
+      position: relative
+    }
+
+    .section-light::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle .8px, rgba(14, 26, 74, .03) .5px, transparent .5px);
+      background-size: 28px 28px;
+      pointer-events: none
+    }
+
+    .section-light .glow-bg {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(70px);
+      pointer-events: none
+    }
+
+    .gb1 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(79, 125, 245, .1), transparent 55%);
+      top: -10%;
+      right: -5%
+    }
+
+    .gb2 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(0, 184, 212, .06), transparent 55%);
+      bottom: 5%;
+      left: -5%
+    }
+
+    .features {
+      position: relative;
+      z-index: 1;
+      padding: 100px 24px;
+      max-width: 1000px;
+      margin: 0 auto
+    }
+
+    .sec-label {
+      font-family: var(--serif);
+      font-size: 14px;
+      font-style: italic;
+      letter-spacing: .08em;
+      color: var(--blue);
+      font-weight: 400;
+      margin-bottom: 8px;
+      text-align: center
+    }
+
+    .sec-heading {
+      font-family: var(--serif);
+      font-size: clamp(30px, 5vw, 48px);
+      font-weight: 300;
+      text-align: center;
+      margin-bottom: 12px;
+      letter-spacing: .01em;
+      color: var(--navy);
+      line-height: 1.2
+    }
+
+    .sec-heading em {
+      font-style: italic;
+      font-weight: 400
+    }
+
+    .sec-sub {
+      font-size: 14px;
+      color: var(--text3);
+      text-align: center;
+      max-width: 420px;
+      margin: 0 auto 52px;
+      font-family: var(--jp);
+      line-height: 2;
+      font-weight: 300
+    }
+
+    .feat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px
+    }
+
+    .feat-card {
+      border-radius: 20px;
+      padding: 32px 24px;
+      transition: all .4s cubic-bezier(.16, 1, .3, 1);
+      cursor: default;
+      position: relative;
+      overflow: hidden
+    }
+
+    .feat-card>.e {
+      border-radius: 20px
+    }
+
+    .feat-card>.t {
+      border-radius: 20px;
+      background: rgba(255, 255, 255, .32)
+    }
+
+    .feat-card>.s {
+      border-radius: 20px;
+      box-shadow: inset 2px 2px 1px 0 rgba(255, 255, 255, .6), inset -1px -1px 1px 1px rgba(255, 255, 255, .45)
+    }
+
+    .feat-card:hover {
+      transform: translateY(-4px)
+    }
+
+    .feat-card:hover>.t {
+      background: rgba(255, 255, 255, .45)
+    }
+
+    .feat-num {
+      font-family: var(--serif);
+      font-size: 36px;
+      font-weight: 300;
+      color: rgba(14, 26, 74, .06);
+      margin-bottom: 12px;
+      position: relative;
+      z-index: 3;
+      line-height: 1
+    }
+
+    .feat-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+      background: rgba(79, 125, 245, .05);
+      position: relative;
+      z-index: 3
+    }
+
+    .feat-icon svg {
+      width: 18px;
+      height: 18px
+    }
+
+    .feat-card h3 {
+      font-family: var(--serif);
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: var(--navy);
+      position: relative;
+      z-index: 3
+    }
+
+    .feat-card p {
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.9;
+      font-family: var(--jp);
+      font-weight: 300;
+      position: relative;
+      z-index: 3
+    }
+
+    .flow {
+      position: relative;
+      z-index: 1;
+      padding: 40px 24px 100px;
+      max-width: 900px;
+      margin: 0 auto
+    }
+
+    .flow-steps {
+      display: flex;
+      gap: 0;
+      align-items: flex-start;
+      position: relative
+    }
+
+    .flow-steps::before {
+      content: '';
+      position: absolute;
+      top: 24px;
+      left: 80px;
+      right: 80px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(79, 125, 245, .1), transparent)
+    }
+
+    .flow-step {
+      flex: 1;
+      text-align: center;
+      position: relative;
+      padding: 0 12px
+    }
+
+    .step-num-wrap {
+      width: 36px;
+      height: 36px;
+      margin: 0 auto 16px;
+      position: relative;
+      z-index: 2;
+      border-radius: 50%;
+      overflow: hidden
+    }
+
+    .step-num-wrap>.e {
+      border-radius: 50%
+    }
+
+    .step-num-wrap>.t {
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .45)
+    }
+
+    .step-num-wrap>.s {
+      border-radius: 50%
+    }
+
+    .step-num {
+      position: relative;
+      z-index: 3;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--serif);
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--navy)
+    }
+
+    .flow-step h4 {
+      font-family: var(--serif);
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: var(--navy)
+    }
+
+    .flow-step p {
+      font-size: 12px;
+      color: var(--text3);
+      line-height: 1.8;
+      font-family: var(--jp);
+      font-weight: 300
+    }
+
+    .cta-section {
+      position: relative;
+      z-index: 1;
+      padding: 40px 24px 120px;
+      text-align: center
+    }
+
+    .cta-box {
+      max-width: 560px;
+      margin: 0 auto;
+      padding: 48px 40px;
+      border-radius: 24px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 40px rgba(14, 26, 74, .05)
+    }
+
+    .cta-box>.e {
+      border-radius: 24px
+    }
+
+    .cta-box>.t {
+      border-radius: 24px;
+      background: rgba(255, 255, 255, .35)
+    }
+
+    .cta-box>.s {
+      border-radius: 24px
+    }
+
+    .cta-box h2 {
+      font-family: var(--serif);
+      font-size: 28px;
+      font-weight: 400;
+      margin-bottom: 12px;
+      color: var(--navy);
+      position: relative;
+      z-index: 3;
+      line-height: 1.3
+    }
+
+    .cta-box h2 em {
+      font-style: italic
+    }
+
+    .cta-box .jp {
+      font-family: var(--jp);
+      font-size: 14px;
+      color: var(--text3);
+      margin-bottom: 28px;
+      line-height: 2;
+      font-weight: 300;
+      position: relative;
+      z-index: 3
+    }
+
+    .btn-dark {
+      position: relative;
+      z-index: 3;
+      padding: 16px 40px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--white);
+      background: var(--navy);
+      border: none;
+      cursor: pointer;
+      transition: all .4s;
+      letter-spacing: .03em;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--jp)
+    }
+
+    .btn-dark:hover {
+      background: var(--navy2);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(14, 26, 74, .15)
+    }
+
+    .btn-dark svg {
+      transition: transform .3s
+    }
+
+    .btn-dark:hover svg {
+      transform: translateX(3px)
+    }
+
+    .footer {
+      padding: 32px 24px;
+      text-align: center;
+      background: var(--white)
+    }
+
+    .footer p {
+      font-size: 11px;
+      color: var(--text4);
+      letter-spacing: .04em;
+      font-family: var(--serif)
+    }
+
+    .sr {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity .8s cubic-bezier(.16, 1, .3, 1), transform .8s cubic-bezier(.16, 1, .3, 1)
+    }
+
+    .sr.v {
+      opacity: 1;
+      transform: translateY(0)
+    }
+
+    .sr.d1 {
+      transition-delay: .1s
+    }
+
+    .sr.d2 {
+      transition-delay: .2s
+    }
+
+    .sr.d3 {
+      transition-delay: .3s
+    }
+
+    .sr.d4 {
+      transition-delay: .4s
+    }
+
+    /* ═══════════════════════
+   SCREEN 2: CHAT
+   ═══════════════════════ */
+    .app-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background: linear-gradient(170deg, #fff 0%, #f4f6fc 15%, #eaedfa 30%, #dfe4f4 50%, #d0d8ee 65%, #c8d2ea 78%, #dde3f2 90%, #f0f2fa 100%);
+      display: none
+    }
+
+    .app-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle .8px, rgba(14, 26, 74, .03) .5px, transparent .5px);
+      background-size: 26px 26px
+    }
+
+    .app-bg .gl {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(70px);
+      will-change: transform
+    }
+
+    .gl1 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(79, 125, 245, .12), transparent 55%);
+      top: -10%;
+      right: -5%;
+      animation: gf 20s ease-in-out infinite alternate
+    }
+
+    .gl2 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(0, 184, 212, .07), transparent 55%);
+      bottom: 5%;
+      left: -5%;
+      animation: gf 24s ease-in-out infinite alternate-reverse
+    }
+
+    @keyframes gf {
+      0% {
+        transform: translate(0, 0) scale(1)
+      }
+
+      100% {
+        transform: translate(-60px, 40px) scale(1.1)
+      }
+    }
+
+    #chat {
+      background: transparent
+    }
+
+    .chat-header {
+      flex: 0 0 auto;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, .4)
+    }
+
+    .chat-header .back {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: none;
+      background: rgba(255, 255, 255, .3);
+      color: var(--text2);
+      transition: background .2s
+    }
+
+    .chat-header .back:hover {
+      background: rgba(255, 255, 255, .5)
+    }
+
+    .chat-header .title {
+      font-family: var(--serif);
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--navy)
+    }
+
+    .chat-header .step {
+      font-size: 11px;
+      color: var(--text4);
+      margin-left: auto
+    }
+
+    .chat-body {
+      flex: 1 1 0;
+      min-height: 0;
+      height: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      scroll-behavior: smooth
+    }
+
+    .chat-body::-webkit-scrollbar {
+      width: 3px
+    }
+
+    .chat-body::-webkit-scrollbar-thumb {
+      background: rgba(14, 26, 74, .06);
+      border-radius: 3px
+    }
+
+    .msg {
+      max-width: 80%;
+      padding: 12px 16px;
+      border-radius: 16px;
+      font-size: 14px;
+      line-height: 1.8;
+      font-family: var(--jp);
+      font-weight: 400;
+      animation: msgIn .3s ease both;
+      opacity: 0;
+      flex-shrink: 0
+    }
+
+    @keyframes msgIn {
+      0% {
+        opacity: 0;
+        transform: translateY(8px)
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .msg.bot {
+      align-self: flex-start;
+      color: var(--text);
+      border-radius: 4px 16px 16px 16px;
+      overflow: hidden;
+      position: relative
+    }
+
+    .msg.bot>.e {
+      border-radius: 4px 16px 16px 16px
+    }
+
+    .msg.bot>.t {
+      border-radius: 4px 16px 16px 16px;
+      background: rgba(255, 255, 255, .35)
+    }
+
+    .msg.bot>.s {
+      border-radius: 4px 16px 16px 16px
+    }
+
+    .msg.bot .mc {
+      position: relative;
+      z-index: 3
+    }
+
+    .msg.user {
+      align-self: flex-end;
+      background: var(--navy);
+      color: var(--white);
+      border-radius: 16px 4px 16px 16px
+    }
+
+    .chat-choices {
+      flex: 0 0 auto;
+      padding: 12px 20px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px
+    }
+
+    .chat-choices.hidden {
+      display: none
+    }
+
+    .choice-btn {
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--navy);
+      border: 1px solid rgba(14, 26, 74, .1);
+      background: rgba(255, 255, 255, .5);
+      cursor: pointer;
+      transition: all .25s;
+      font-family: var(--jp);
+      backdrop-filter: blur(6px)
+    }
+
+    .choice-btn:hover {
+      background: rgba(14, 26, 74, .04);
+      border-color: rgba(14, 26, 74, .2)
+    }
+
+    .choice-btn:active {
+      transform: scale(.97)
+    }
+
+    .typing-dots {
+      display: flex;
+      gap: 4px;
+      padding: 4px 0
+    }
+
+    .typing-dots span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--text4);
+      animation: dotBounce 1.2s ease-in-out infinite
+    }
+
+    .typing-dots span:nth-child(2) {
+      animation-delay: .15s
+    }
+
+    .typing-dots span:nth-child(3) {
+      animation-delay: .3s
+    }
+
+    @keyframes dotBounce {
+
+      0%,
+      60%,
+      100% {
+        transform: translateY(0)
+      }
+
+      30% {
+        transform: translateY(-6px)
+      }
+    }
+
+    /* ═══════════════════════
+   SCREEN 3: CAMERA
+   ═══════════════════════ */
+    #camera {
+      background: #000;
+      justify-content: center;
+      align-items: center
+    }
+
+    .cam-wrap {
+      width: 100%;
+      max-width: 480px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px
+    }
+
+    .cam-viewfinder {
+      width: 100%;
+      aspect-ratio: 3/4;
+      border-radius: 24px;
+      overflow: hidden;
+      position: relative;
+      background: #111;
+      margin-bottom: 24px
+    }
+
+    .cam-viewfinder video,
+    .cam-viewfinder img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover
+    }
+
+    .cam-viewfinder .guide {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none
+    }
+
+    .cam-viewfinder .guide-oval {
+      position: absolute;
+      top: 8%;
+      left: 15%;
+      right: 15%;
+      bottom: 12%;
+      border: 2px solid rgba(255, 255, 255, .3);
+      border-radius: 50%;
+      animation: guidePulse 3s ease-in-out infinite
+    }
+
+    @keyframes guidePulse {
+
+      0%,
+      100% {
+        border-color: rgba(255, 255, 255, .3)
+      }
+
+      50% {
+        border-color: rgba(255, 255, 255, .6)
+      }
+    }
+
+    .cam-viewfinder .guide-text {
+      position: absolute;
+      bottom: 6%;
+      left: 0;
+      right: 0;
+      text-align: center;
+      color: rgba(255, 255, 255, .6);
+      font-size: 12px;
+      font-family: var(--jp);
+      font-weight: 300
+    }
+
+    .cam-viewfinder .corner {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      z-index: 3
+    }
+
+    .cam-viewfinder .corner::before,
+    .cam-viewfinder .corner::after {
+      content: '';
+      position: absolute;
+      background: rgba(0, 184, 212, .6)
+    }
+
+    .corner.ctl {
+      top: 16px;
+      left: 16px
+    }
+
+    .corner.ctl::before {
+      width: 20px;
+      height: 2px
+    }
+
+    .corner.ctl::after {
+      width: 2px;
+      height: 20px
+    }
+
+    .corner.ctr {
+      top: 16px;
+      right: 16px
+    }
+
+    .corner.ctr::before {
+      width: 20px;
+      height: 2px;
+      right: 0
+    }
+
+    .corner.ctr::after {
+      width: 2px;
+      height: 20px;
+      right: 0
+    }
+
+    .corner.cbl {
+      bottom: 16px;
+      left: 16px
+    }
+
+    .corner.cbl::before {
+      width: 20px;
+      height: 2px;
+      bottom: 0
+    }
+
+    .corner.cbl::after {
+      width: 2px;
+      height: 20px;
+      bottom: 0
+    }
+
+    .corner.cbr {
+      bottom: 16px;
+      right: 16px
+    }
+
+    .corner.cbr::before {
+      width: 20px;
+      height: 2px;
+      right: 0;
+      bottom: 0
+    }
+
+    .corner.cbr::after {
+      width: 2px;
+      height: 20px;
+      right: 0;
+      bottom: 0
+    }
+
+    .shutter-btn {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      border: 3px solid rgba(255, 255, 255, .8);
+      background: transparent;
+      cursor: pointer;
+      position: relative;
+      transition: all .2s
+    }
+
+    .shutter-btn::after {
+      content: '';
+      position: absolute;
+      inset: 5px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .9);
+      transition: all .15s
+    }
+
+    .shutter-btn:active::after {
+      transform: scale(.85);
+      background: rgba(255, 255, 255, .7)
+    }
+
+    .cam-label {
+      color: rgba(255, 255, 255, .5);
+      font-size: 12px;
+      margin-top: 14px;
+      font-family: var(--jp);
+      font-weight: 300
+    }
+
+    /* ═══════════════════════
+   SCREEN 4: ANALYZING
+   ═══════════════════════ */
+    #analyzing {
+      background: transparent;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 24px
+    }
+
+    .analyze-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 24px;
+      position: relative
+    }
+
+    .analyze-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      border-top-color: var(--blue);
+      animation: spin 1s linear infinite
+    }
+
+    .analyze-ring:nth-child(2) {
+      inset: 8px;
+      border-top-color: var(--cyan);
+      animation-duration: 1.5s;
+      animation-direction: reverse
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    .analyze-icon svg {
+      position: absolute;
+      inset: 20px;
+      width: 40px;
+      height: 40px;
+      color: var(--navy);
+      opacity: .5
+    }
+
+    .analyze-text {
+      font-family: var(--jp);
+      font-size: 15px;
+      color: var(--text2);
+      font-weight: 400;
+      margin-bottom: 8px
+    }
+
+    .analyze-sub {
+      font-size: 12px;
+      color: var(--text4);
+      letter-spacing: .04em
+    }
+
+    .progress-bar {
+      width: 200px;
+      height: 3px;
+      border-radius: 2px;
+      background: rgba(14, 26, 74, .06);
+      margin: 20px auto 0;
+      overflow: hidden
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--blue), var(--cyan));
+      width: 0%;
+      transition: width .3s ease
+    }
+
+    /* ═══════════════════════
+   SCREEN 5: REPORT
+   ═══════════════════════ */
+    #report iframe {
+      width: 100%;
+      height: 100%;
+      border: none
+    }
+
+    .report-back-btn {
+      display: none;
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 9999;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--navy);
+      transition: background .2s, transform .15s
+    }
+
+    .report-back-btn:hover {
+      background: rgba(255, 255, 255, 1);
+      transform: scale(1.05)
+    }
+
+    /* ═══ RESPONSIVE ═══ */
+    @media(max-width:768px) {
+      .hero {
+        min-height: auto;
+        height: 100vh;
+        height: 100dvh
+      }
+
+      .feat-grid {
+        grid-template-columns: 1fr
+      }
+
+      .flow-steps {
+        flex-direction: column;
+        gap: 24px
+      }
+
+      .flow-steps::before {
+        display: none
+      }
+
+      .nav-links {
+        display: none
+      }
+
+      .nav {
+        padding: 14px 20px
+      }
+
+      .cta-box {
+        padding: 32px 20px
+      }
+
+      .hero h1 {
+        font-size: clamp(36px, 10vw, 56px)
+      }
+      .hero {
+        min-height: auto;
+        height: 100vh;
+        height: 100dvh
+      }
+      .hero-video video,
+      .hero-video img {
+        object-position: center 40%
+      }
+    }
+
+    @media(max-width:480px) {
+      .hero-actions {
+        flex-direction: column;
+        align-items: stretch
+      }
+
+      .btn-primary,
+      .btn-ghost,
+      .btn-dark {
+        justify-content: center
+      }
+
+      .msg {
+        max-width: 88%;
+        font-size: 15px;
+        -webkit-text-size-adjust: 100%
+      }
+
+      .hero {
+        min-height: 100vh;
+        min-height: 100dvh
+      }
+
+      .hero-video video,
+      .hero-video img {
+        object-position: center 40%
+      }
+
+      .chat-body {
+        -webkit-text-size-adjust: 100%;
+        font-size: 15px
+      }
+
+      .opt-btn,
+      .choice-btn {
+        font-size: 14px;
+        -webkit-text-size-adjust: 100%
+      }
+
+      .hero-slides {
+        min-height: 180px
+      }
+
+      .hero-slide .hs-title {
+        font-size: clamp(24px, 6vw, 36px)
+      }
+
+      .hero-slide .hs-stat {
+        font-size: clamp(36px, 10vw, 52px)
+      }
+
+      .hero-slide .hs-desc {
+        font-size: 12px
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- BG for chat/analyze screens (hidden initially) -->
+  <div class="app-bg" id="appBg">
+    <div class="gl gl1"></div>
+    <div class="gl gl2"></div>
+  </div>
+
+  <!-- ═══════════════════════════════
+     SCREEN 1: TOP (v5 inlined)
+     ═══════════════════════════════ -->
+  <div class="screen active" id="top">
+
+    <nav class="nav" id="mainNav">
+      <div class="nav-inner">
+        <span class="nav-brand">AIMY</span>
+        <div class="nav-links">
+          <a href="#">Features</a>
+          <a href="#">How it works</a>
+          <a href="#">For Clinics</a>
+          <a href="javascript:void(0)" class="nav-cta-link" onclick="goTo('chat')">無料で診断する</a>
+        </div>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-video">
+        <!--
+    ╔══════════════════════════════════════════════════════╗
+    ║  動画の差し替え方法:                                  ║
+    ║  1. 動画ファイル(mp4)をこのHTMLと同じフォルダに置く      ║
+    ║  2. 下の source src="..." を動画ファイル名に変更        ║
+    ║     例: src="aimy-hero.mp4"                          ║
+    ║  3. poster="..." はフォールバック画像（動画読込前に表示） ║
+    ╚══════════════════════════════════════════════════════╝
+    -->
+        <video autoplay muted loop playsinline>
+          <source src="aimy-hero.mp4" type="video/mp4">
+        </video>
+      </div>
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <div class="hero-badge lg">
+          <div class="e"></div>
+          <div class="t"></div>
+          <div class="s"></div>
+          <div class="inner"><span class="pulse"></span>Intelligent Skin Diagnosis</div>
+        </div>
+        <h1><em>AIMY</em></h1>
+        <p class="hero-sub">あなたの肌を、科学する。<br>5つのエリア × 5つの指標で肌を解析し、<br>最適な施術プランをご提案します。</p>
+        <div class="hero-actions">
+          <a href="javascript:void(0)" class="btn-primary" onclick="goTo('chat')">無料で診断をはじめる<svg width="16" height="16"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg></a>
+          <a href="investor-pitch.html" class="btn-ghost lg">
+            <div class="e"></div>
+            <div class="t"></div>
+            <div class="s"></div>
+            <div class="inner"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="1.5">
+                <circle cx="12" cy="12" r="10" />
+                <polygon points="10,8 16,12 10,16" fill="currentColor" />
+              </svg>デモを見る</div>
+          </a>
+        </div>
+      </div>
+      <div class="hero-scroll"><span>Scroll</span>
+        <div class="scroll-line"></div>
+      </div>
+    </section>
+
+    <div class="section-light">
+      <div class="glow-bg gb1"></div>
+      <div class="glow-bg gb2"></div>
+      <section class="features">
+        <div class="sec-label sr">Features</div>
+        <h2 class="sec-heading sr d1">5つの解析、<em>25</em>の指標。</h2>
+        <p class="sec-sub sr d2">独自の画像解析テクノロジーが、肉眼では見えない<br>肌の深層データを可視化します。</p>
+        <div class="feat-grid">
+          <div class="feat-card lg sr d1">
+            <div class="e"></div>
+            <div class="t"></div>
+            <div class="s"></div>
+            <div class="feat-num">01</div>
+            <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="1.5">
+                <circle cx="12" cy="12" r="3" />
+                <path
+                  d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" />
+              </svg></div>
+            <h3>シミ解析</h3>
+            <p>紫外線ダメージの蓄積を3Dマッピング。表皮レベルの浅いシミから隠れジミまで検出します。</p>
+          </div>
+          <div class="feat-card lg sr d2">
+            <div class="e"></div>
+            <div class="t"></div>
+            <div class="s"></div>
+            <div class="feat-num">02</div>
+            <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="1.5">
+                <path d="M3 12c0-4.97 4-9 9-9s9 4.03 9 9" />
+                <path d="M3 12c0 4.97 4 9 9 9s9-4.03 9-9" />
+                <line x1="3" y1="12" x2="21" y2="12" />
+              </svg></div>
+            <h3>シワ深度</h3>
+            <p>表情ジワから深いシワまで深度・分布・種類を部位ごとに数値化。経過観察にも対応します。</p>
+          </div>
+          <div class="feat-card lg sr d3">
+            <div class="e"></div>
+            <div class="t"></div>
+            <div class="s"></div>
+            <div class="feat-num">03</div>
+            <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#00c853" stroke-width="1.5">
+                <rect x="3" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="3" width="7" height="7" rx="1" />
+                <rect x="3" y="14" width="7" height="7" rx="1" />
+                <rect x="14" y="14" width="7" height="7" rx="1" />
+              </svg></div>
+            <h3>テクスチャー</h3>
+            <p>キメ・ハリ・弾力・なめらかさを多角的にスコアリング。肌の基礎コンディションを見える化します。</p>
+          </div>
+          <div class="feat-card lg sr d1">
+            <div class="e"></div>
+            <div class="t"></div>
+            <div class="s"></div>
+            <div class="feat-num">04</div>
+            <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#e53935" stroke-width="1.5">
+                <path
+                  d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+              </svg></div>
+            <h3>赤み検知</h3>
+            <p>炎症性の赤みと血行由来の赤みを自動判別。敏感肌リスクを事前に把握し施術選択を支援します。</p>
+          </div>
+          <div class="feat-card lg sr d2">
+            <div class="e"></div>
+            <div class="t"></div>
+            <div class="s"></div>
+            <div class="feat-num">05</div>
+            <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="1.5">
+                <circle cx="12" cy="12" r="1.5" />
+                <circle cx="12" cy="12" r="5" />
+                <circle cx="12" cy="12" r="9" />
+              </svg></div>
+            <h3>毛穴マッピング</h3>
+            <p>開き毛穴・黒ずみ・たるみ毛穴を部位ごとに分類。タイプに応じた最適なケアを提案します。</p>
+          </div>
+          <div class="feat-card lg sr d3">
+            <div class="e"></div>
+            <div class="t"></div>
+            <div class="s"></div>
+            <div class="feat-num">06</div>
+            <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="1.5">
+                <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                <path d="M2 17l10 5 10-5" />
+                <path d="M2 12l10 5 10-5" />
+              </svg></div>
+            <h3>施術レコメンド</h3>
+            <p>全25指標の解析結果とライフスタイルを考慮し、最適な施術プランを自動提示します。</p>
+          </div>
+        </div>
+      </section>
+      <section class="flow">
+        <div class="sec-label sr">How it works</div>
+        <h2 class="sec-heading sr d1">4ステップで<em>完了</em></h2>
+        <p class="sec-sub sr d2">撮影からレポート生成まで、わずか数分。</p>
+        <div class="flow-steps">
+          <div class="flow-step sr d1">
+            <div class="step-num-wrap lg">
+              <div class="e"></div>
+              <div class="t"></div>
+              <div class="s"></div>
+              <div class="step-num">1</div>
+            </div>
+            <h4>撮影</h4>
+            <p>スマートフォンで顔を撮影。ガイドに沿うだけで正確な解析が可能です。</p>
+          </div>
+          <div class="flow-step sr d2">
+            <div class="step-num-wrap lg">
+              <div class="e"></div>
+              <div class="t"></div>
+              <div class="s"></div>
+              <div class="step-num">2</div>
+            </div>
+            <h4>肌解析</h4>
+            <p>5エリア×5指標で肌をスキャン。数秒で25項目のデータを生成します。</p>
+          </div>
+          <div class="flow-step sr d3">
+            <div class="step-num-wrap lg">
+              <div class="e"></div>
+              <div class="t"></div>
+              <div class="s"></div>
+              <div class="step-num">3</div>
+            </div>
+            <h4>レポート</h4>
+            <p>解析マップ・スコア・施術提案をまとめたレポートを自動生成。</p>
+          </div>
+          <div class="flow-step sr d4">
+            <div class="step-num-wrap lg">
+              <div class="e"></div>
+              <div class="t"></div>
+              <div class="s"></div>
+              <div class="step-num">4</div>
+            </div>
+            <h4>カウンセリング</h4>
+            <p>レポートをもとに医師が最終判断。データに基づいた提案が可能です。</p>
+          </div>
+        </div>
+      </section>
+      <section class="cta-section">
+        <div class="cta-box lg sr">
+          <div class="e"></div>
+          <div class="t"></div>
+          <div class="s"></div>
+          <h2>肌の未来を、<br><em>今すぐ知る。</em></h2>
+          <p class="jp">あなただけの肌診断レポートを、すぐにお届け。<br>まずは無料で体験してみませんか？</p>
+          <a href="javascript:void(0)" class="btn-dark" onclick="goTo('chat')">無料で診断をはじめる<svg width="16" height="16"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg></a>
+        </div>
+      </section>
+    </div>
+    <footer class="footer">
+      <p>&copy; 2025 AIMY — All rights reserved.</p>
+    </footer>
+  </div><!-- /top -->
+
+  <!-- ═══ SCREEN 2: CHAT ═══ -->
+  <div class="screen" id="chat">
+    <div class="chat-header"><button class="back" onclick="goTo('top')"><svg width="18" height="18" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5M12 19l-7-7 7-7" />
+        </svg></button>
+      <div class="title">AIMY</div>
+      <div class="step" id="chatStep">Step 1 / 4</div>
+    </div>
+    <div class="chat-body" id="chatBody"></div>
+    <div class="chat-choices" id="chatChoices"></div>
+  </div>
+
+  <!-- ═══ SCREEN 3: CAMERA ═══ -->
+  <div class="screen" id="camera">
+    <div class="cam-wrap">
+      <div class="cam-viewfinder">
+        <video id="camVideo" autoplay playsinline muted></video>
+        <img id="camFallback"
+          src="https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=400&h=530&fit=crop&crop=face&auto=format&q=80"
+          alt="" style="display:none">
+        <div class="guide">
+          <div class="guide-oval"></div>
+          <div class="guide-text">顔を枠内に合わせてください</div>
+        </div>
+        <div class="corner ctl"></div>
+        <div class="corner ctr"></div>
+        <div class="corner cbl"></div>
+        <div class="corner cbr"></div>
+      </div>
+      <button class="shutter-btn" onclick="capturePhoto()"></button>
+      <div class="cam-label">タップして撮影</div>
+    </div>
+  </div>
+
+  <!-- ═══ SCREEN 4: ANALYZING ═══ -->
+  <div class="screen" id="analyzing">
+    <div class="analyze-icon">
+      <div class="analyze-ring"></div>
+      <div class="analyze-ring"></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="11" cy="11" r="8" />
+        <path d="M21 21l-4.35-4.35" />
+      </svg>
+    </div>
+    <div class="analyze-text">肌を解析しています...</div>
+    <div class="analyze-sub" id="analyzeLabel">シミ・色素沈着を検出中</div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
+
+  <!-- ═══ SCREEN 5: REPORT ═══ -->
+  <div class="screen" id="report">
+    <button class="report-back-btn" onclick="goTo('top')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <iframe id="reportFrame" src="about:blank"></iframe>
+  </div>
+
+  <!-- SVG FILTER -->
+  <svg style="display:none">
+    <filter id="glass-distortion" x="-10%" y="-10%" width="120%" height="120%" filterUnits="objectBoundingBox">
+      <feTurbulence type="fractalNoise" baseFrequency="0.01 0.01" numOctaves="1" seed="5" result="turbulence" />
+      <feComponentTransfer in="turbulence" result="mapped">
+        <feFuncR type="gamma" amplitude="1" exponent="10" offset="0.5" />
+        <feFuncG type="gamma" amplitude="0" exponent="1" offset="0" />
+        <feFuncB type="gamma" amplitude="0" exponent="1" offset="0.5" />
+      </feComponentTransfer>
+      <feGaussianBlur in="turbulence" stdDeviation="3" result="softMap" />
+      <feSpecularLighting in="softMap" surfaceScale="5" specularConstant="1" specularExponent="100"
+        lighting-color="white" result="specLight">
+        <fePointLight x="-200" y="-200" z="300" />
+      </feSpecularLighting>
+      <feComposite in="specLight" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="litImage" />
+      <feDisplacementMap in="SourceGraphic" in2="softMap" scale="150" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+  </svg>
+
+  <script src="config.js"></script>
+  <script>
+    // ═══ GEMINI API 設定 ═══
+    // API キーは config.js の window.AIMY_CONFIG.GEMINI_API_KEY に設定してください
+    // （config.js は .gitignore に含まれており、Git にはコミットされません）
+    var GEMINI_API_KEY = (window.AIMY_CONFIG && window.AIMY_CONFIG.GEMINI_API_KEY) || '';
+    // Python API のベース URL（空 = 同一オリジン、本番は Railway の URL を config.js に設定）
+    var API_BASE_URL   = (window.AIMY_CONFIG && window.AIMY_CONFIG.API_BASE_URL)   || '';
+
+    // Gemini で10年後/20年後の顔画像を生成
+    async function generateFutureWithGemini(photoDataUrl, years) {
+      if (!GEMINI_API_KEY) return null;
+      var parts = photoDataUrl.split(',');
+      var base64 = parts[1];
+      var mimeType = parts[0].split(':')[1].split(';')[0];
+      var prompt = years === 10
+        ? 'この顔写真の人物の10年後の自然な老化シミュレーション画像を生成してください。シミ・小じわ・毛穴の目立ちを適度に加え、同じ人物として自然に老化した姿を表現してください。元の構図・アングルを維持してください。'
+        : 'この顔写真の人物の20年後の自然な老化シミュレーション画像を生成してください。シミ・シワ・たるみ・ほうれい線を明確に加え、同じ人物として自然に老化した姿を表現してください。元の構図・アングルを維持してください。';
+      try {
+        console.log('[AIMY] Gemini画像生成 リクエスト送信 (' + years + '年後)');
+        var resp = await fetch(
+          'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key=' + GEMINI_API_KEY,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [
+                { inline_data: { mime_type: mimeType, data: base64 } },
+                { text: prompt }
+              ]}],
+              generationConfig: { responseModalities: ['IMAGE', 'TEXT'] }
+            })
+          }
+        );
+        var json = await resp.json();
+        console.log('[AIMY] Gemini画像生成 レスポンス (' + years + '年後):', JSON.stringify(json).slice(0, 300));
+        if (!resp.ok) throw new Error(json.error && json.error.message || resp.status);
+        var parts = (json.candidates && json.candidates[0] && json.candidates[0].content && json.candidates[0].content.parts) || [];
+        var imgPart = parts.find(function(p) { return p.inlineData; });
+        if (!imgPart) { console.warn('[AIMY] Gemini画像生成: 画像パートなし。parts:', JSON.stringify(parts).slice(0,200)); return null; }
+        return 'data:' + imgPart.inlineData.mimeType + ';base64,' + imgPart.inlineData.data;
+      } catch (e) {
+        console.error('[AIMY] Gemini画像生成エラー (' + years + '年後):', e);
+        return null;
+      }
+    }
+
+    // Gemini Vision API で肌分析を実行
+    async function analyzeWithGemini(photoDataUrl) {
+      if (!GEMINI_API_KEY) return null;
+      var parts = photoDataUrl.split(',');
+      var base64 = parts[1];
+      var mimeType = parts[0].split(':')[1].split(';')[0];
+
+      // ドクターズコスメカタログ（id・名前・悩みカテゴリのみ）
+      var COSME_CAT = [
+        {id:0,n:"ハイドレーティングクレンザー",s:"乾燥 敏感"},
+        {id:1,n:"ジェントルクレンザー",s:"毛穴 くすみ"},
+        {id:2,n:"エクスフォリエーティングクレンザー",s:"毛穴 ニキビ 皮脂"},
+        {id:3,n:"バランサートナー",s:"毛穴 キメ"},
+        {id:4,n:"イルミネーティングAOXセラム",s:"くすみ 光老化 ハリ"},
+        {id:5,n:"シーセラム",s:"シミ くすみ ハリ"},
+        {id:6,n:"ブライタライブ",s:"シミ 肝斑 くすみ"},
+        {id:7,n:"デイリーPD",s:"小じわ ハリ 毛穴 光老化"},
+        {id:8,n:"RCクリーム",s:"小じわ 乾燥 ハリ"},
+        {id:9,n:"Wテクスチャーリペア",s:"小じわ 毛穴 ハリ たるみ"},
+        {id:10,n:"スキンブライセラム0.25",s:"シミ くすみ 小じわ"},
+        {id:11,n:"スキンブライセラム1.0",s:"シミ 色素沈着 小じわ"},
+        {id:12,n:"ファーミングセラム",s:"たるみ ハリ 小じわ"},
+        {id:13,n:"ハイドラファーム(目元)",s:"目元クマ 目元小じわ"},
+        {id:14,n:"サンスクリーンSPF30",s:"光老化 日焼け シミ予防"},
+        {id:15,n:"BSサンスクリーンSPF50",s:"日焼け 光老化 シミ予防"},
+        {id:16,n:"シエスタフェイスセラム",s:"たるみ ハリ 小じわ くすみ"},
+        {id:17,n:"RGブースター",s:"ハリ 再生 小じわ"},
+        {id:18,n:"レチノプラスフェイスクリーム",s:"小じわ シミ キメ"},
+        {id:19,n:"ルミネートフェイスローション",s:"シミ 肝斑 くすみ 小じわ"},
+        {id:20,n:"マリーニペプチド美容液",s:"ハリ キメ 乾燥"},
+        {id:21,n:"ハイラフェイスセラム",s:"乾燥 ハリ キメ"},
+        {id:22,n:"マリーニフェイスクリーム",s:"ハリ 小じわ たるみ"},
+        {id:23,n:"ロザリーブフェイスローション",s:"赤み 酒さ 敏感"},
+        {id:24,n:"マリーニサンスクリーンSPF45",s:"日焼け 光老化 シミ予防"},
+        {id:25,n:"DEJフェイスクリーム",s:"シミ 小じわ たるみ 毛穴"},
+        {id:26,n:"DEJナイトクリーム",s:"シミ 小じわ くすみ たるみ"},
+        {id:27,n:"C+コレクティング30%",s:"シミ くすみ 小じわ 赤み"},
+        {id:28,n:"Revoxスムーシングセラム",s:"小じわ 表情ジワ ハリ"},
+        {id:29,n:"Nectifirmアドバンス",s:"たるみ 首シワ くすみ"},
+        {id:30,n:"インテリシェイド",s:"シミ くすみ 赤み 光老化"},
+        {id:31,n:"Aアドバンス0.5",s:"小じわ 毛穴 くすみ ハリ"},
+        {id:32,n:"Aアドバンス1.0",s:"小じわ 毛穴 くすみ ハリ"},
+        {id:33,n:"HAハイドラセラム",s:"乾燥 小じわ 敏感"},
+        {id:34,n:"TAホワイトローション",s:"シミ くすみ 肌荒れ"},
+        {id:35,n:"TAホワイトエッセンス",s:"シミ くすみ 肌荒れ"},
+        {id:36,n:"TAホワイトエマルジョン",s:"シミ 乾燥 くすみ"},
+        {id:37,n:"TAクリームAA",s:"シミ 乾燥 肌荒れ"},
+        {id:38,n:"TAバリアローション",s:"肌荒れ 赤み シミ"},
+        {id:39,n:"TAバリアクリーム",s:"肌荒れ 乾燥 赤み"},
+        {id:40,n:"TAレチノファースト",s:"小じわ シミ 毛穴"},
+        {id:41,n:"TAレチノアドバンス",s:"小じわ 毛穴 シミ ハリ"},
+        {id:42,n:"モイストプロテクトUV",s:"光老化 乾燥"},
+        {id:43,n:"TAホワイトプロテクトUV",s:"シミ 光老化 くすみ"},
+        {id:44,n:"TAマイルドプロテクトUV",s:"光老化 敏感"},
+        {id:45,n:"TPNaローション",s:"肌荒れ 赤み ニキビ"},
+        {id:46,n:"ナノHQクリーム10g",s:"シミ 色素沈着 くすみ"},
+        {id:47,n:"ナノHQクリームEX",s:"シミ 色素沈着 肝斑"},
+        {id:48,n:"TAホワイトセラムMD",s:"シミ 肝斑 くすみ"},
+        {id:49,n:"RAクリーム",s:"小じわ 毛穴 ハリ"},
+        {id:50,n:"アミノシナジー",s:"乾燥 ハリ キメ"},
+        {id:51,n:"UVローション",s:"光老化 シミ"},
+        {id:52,n:"UVミルク",s:"光老化 敏感"},
+        {id:53,n:"カモフラージュコンシーラー",s:"赤み カバー"}
+      ];
+
+      var prompt = 'あなたは美容皮膚科の専門AIです。この顔写真を詳しく分析し、以下のJSON形式のみで回答してください（マークダウン不要）。\nスコア定義：overview scoreは0-100で高いほど良好。detail metricは各項目の説明通りに。\n\n{"summary":"全体的な肌状態の総括（2-3文）","skin_age":推定肌年齢整数,"overall_score":総合スコア整数,"shimi":{"score":シミ全体スコア0-100高いほど良好,"kakureshimi":隠れジミスコア,"kusumi":くすみスコア,"concentration":シミ濃度0-100高いほど濃い,"range":分布範囲0-100高いほど広い,"unevenness":色ムラ0-100高いほど多い,"description":"シミ・くすみの分析（3-4文）"},"shiwa":{"score":シワ全体スコア0-100高いほど良好,"depth":シワ深度0-100高いほど深い,"forehead":額のシワ0-100高いほど多い,"eye_corner":目尻のシワ0-100,"nasolabial":ほうれい線0-100高いほど深い,"description":"シワ・たるみの分析（3-4文）"},"texture":{"score":テクスチャー全体スコア0-100高いほど良好,"fineness":キメ細かさ0-100高いほど良好,"elasticity":ハリ弾力0-100高いほど良好,"smoothness":なめらかさ0-100高いほど良好,"glow":ツヤ0-100高いほど良好,"description":"テクスチャーの分析（3-4文）"},"keana":{"score":毛穴全体スコア0-100高いほど良好,"opening":毛穴の開き0-100高いほど開いている,"blackheads":黒ずみ0-100高いほど多い,"clogging":詰まり0-100高いほど多い,"sagging":たるみ毛穴0-100高いほど目立つ,"description":"毛穴の分析（3-4文）"},"akami":{"score":赤み全体スコア0-100高いほど良好,"intensity":赤み強度0-100高いほど強い,"nose_area":鼻周り赤み0-100高いほど赤い,"cheek":頬の赤み0-100高いほど赤い,"inflammation_risk":炎症リスク0-100高いほどリスク高,"description":"赤み・敏感肌の分析（3-4文）"},"recommendations":[{"id":番号,"reason":"理由40字以内"},×5個]}\n\nドクターズコスメカタログ（id・商品名・悩み）:\n' + JSON.stringify(COSME_CAT);
+
+      try {
+        var resp = await fetch(
+          'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + GEMINI_API_KEY,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: mimeType, data: base64 } }] }],
+              generationConfig: { temperature: 0.3, maxOutputTokens: 3000 }
+            })
+          }
+        );
+        var json = await resp.json();
+        console.log('[AIMY] Gemini分析レスポンスステータス:', resp.status, resp.ok ? 'OK' : 'NG');
+        if (!resp.ok) throw new Error((json.error && json.error.message) || resp.status);
+        var rawText = json.candidates[0].content.parts[0].text;
+        console.log('[AIMY] Gemini分析テキスト:', rawText.slice(0, 150));
+        var text = rawText.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+        // JSONブロック抽出（先頭 { から末尾 } まで）
+        var si = text.indexOf('{'), ei = text.lastIndexOf('}');
+        if (si !== -1 && ei !== -1) text = text.slice(si, ei + 1);
+        return JSON.parse(text);
+      } catch (e) {
+        console.error('[AIMY] Gemini分析エラー:', e);
+        return null;
+      }
+    }
+
+    // ═══ SCREEN NAV ═══
+    var currentScreen = 'top';
+    function goTo(id) {
+      if (heroTimer) { clearInterval(heroTimer); heroTimer = null }
+      var cur = document.getElementById(currentScreen);
+      var next = document.getElementById(id);
+      if (!cur || !next) return;
+      cur.classList.remove('active'); cur.classList.add('exit');
+      setTimeout(function () { cur.classList.remove('exit') }, 500);
+      next.classList.add('active'); currentScreen = id;
+      // show/hide shared bg
+      document.getElementById('appBg').style.display = (id === 'top' || id === 'camera' || id === 'report') ? 'none' : 'block';
+      // hide nav on non-top screens
+      document.getElementById('mainNav').style.display = (id === 'top') ? '' : 'none';
+      if (id === 'chat') startChat(); if (id === 'camera') startCamera(); if (id === 'analyzing') startAnalyzing(); if (id === 'report') loadReport();
+      if (id === 'top' && !heroTimer) heroTimer = setInterval(nextHeroSlide, 5000);
+      document.querySelector('.report-back-btn').style.display = (id === 'report') ? 'flex' : 'none';
+    }
+
+    // ═══ TOP: scroll reveal + nav + hover ═══
+    var topEl = document.getElementById('top');
+    var obs = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('v'); obs.unobserve(e.target) } }) }, { threshold: .1, root: topEl });
+    document.querySelectorAll('.sr').forEach(function (el) { obs.observe(el) });
+    topEl.addEventListener('scroll', function () { document.getElementById('mainNav').classList.toggle('scrolled', topEl.scrollTop > 60) });
+    document.querySelectorAll('.feat-card').forEach(function (c) {
+      c.addEventListener('mousemove', function (e) { var r = c.getBoundingClientRect(), t = c.querySelector('.t'), x = ((e.clientX - r.left) / r.width * 100).toFixed(1), y = ((e.clientY - r.top) / r.height * 100).toFixed(1); t.style.background = 'radial-gradient(circle 140px at ' + x + '% ' + y + '%,rgba(255,255,255,.55),rgba(255,255,255,.32))' });
+      c.addEventListener('mouseleave', function () { c.querySelector('.t').style.background = 'rgba(255,255,255,.32)' });
+    });
+
+    // ═══ CHAT ═══
+    var chatFlow = [
+      { bot: 'はじめまして！AIMY肌診断へようこそ。\nいくつか質問させてください。', bot2: '現在、最も気になるお悩みはどれですか？', choices: ['シミ・くすみ', 'シワ・たるみ', '毛穴・テクスチャー', '赤み・敏感肌'], step: 'Step 1 / 3' },
+      { bot: '了解しました。', bot2: 'ダウンタイム（施術後の回復期間）のご希望は？', choices: ['なるべく短く', '1週間程度なら可', '特にこだわらない'], step: 'Step 2 / 3' },
+      { bot: 'ありがとうございます！最後の質問です。', bot2: '過去に美容施術を受けたことはありますか？', choices: ['初めて', '1〜2回ある', '定期的に通っている'], step: 'Step 3 / 3' }
+    ];
+    var chatIndex = 0, chatAnswers = [], chatBody, chatChoices;
+    function startChat() { chatBody = document.getElementById('chatBody'); chatChoices = document.getElementById('chatChoices'); chatBody.innerHTML = ''; chatChoices.innerHTML = ''; chatChoices.classList.add('hidden'); chatIndex = 0; chatAnswers = []; showBotMessages(chatFlow[0]) }
+    function showBotMessages(s) { document.getElementById('chatStep').textContent = s.step; chatChoices.classList.add('hidden'); var t = createBotMsg(); t.querySelector('.mc').innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>'; chatBody.appendChild(t); t.style.animation = 'msgIn .3s ease both'; scrollChat(); setTimeout(function () { t.querySelector('.mc').textContent = s.bot; scrollChat(); if (s.bot2) { setTimeout(function () { var m = createBotMsg(); m.querySelector('.mc').textContent = s.bot2; chatBody.appendChild(m); m.style.animation = 'msgIn .3s ease both'; scrollChat(); setTimeout(function () { showChoices(s.choices) }, 300) }, 600) } else setTimeout(function () { showChoices(s.choices) }, 300) }, 800) }
+    function createBotMsg() { var d = document.createElement('div'); d.className = 'msg bot lg'; d.innerHTML = '<div class="e"></div><div class="t"></div><div class="s"></div><div class="mc c"></div>'; return d }
+    function showChoices(c) { chatChoices.innerHTML = ''; c.forEach(function (t) { var b = document.createElement('button'); b.className = 'choice-btn'; b.textContent = t; b.onclick = function () { selectChoice(t) }; chatChoices.appendChild(b) }); chatChoices.classList.remove('hidden') }
+    function selectChoice(t) { chatChoices.classList.add('hidden'); var u = document.createElement('div'); u.className = 'msg user'; u.textContent = t; u.style.animation = 'msgIn .3s ease both'; chatBody.appendChild(u); scrollChat(); chatAnswers.push(t); chatIndex++; if (chatIndex < chatFlow.length) { setTimeout(function () { showBotMessages(chatFlow[chatIndex]) }, 400) } else { setTimeout(function () { var f = createBotMsg(); f.querySelector('.mc').textContent = 'ヒアリング完了です！\n次に、お顔の写真を撮影します。'; chatBody.appendChild(f); f.style.animation = 'msgIn .3s ease both'; scrollChat(); setTimeout(function () { chatChoices.innerHTML = ''; var b = document.createElement('button'); b.className = 'choice-btn'; b.textContent = '撮影へ進む →'; b.style.cssText = 'background:var(--navy);color:var(--white);border:none;font-weight:600'; b.onclick = function () { var d = new Date(); var dateStr = d.getFullYear() + '年' + (d.getMonth()+1) + '月' + d.getDate() + '日'; localStorage.setItem('aimyChatData', JSON.stringify({ concern: chatAnswers[0], downtime: chatAnswers[1], experience: chatAnswers[2], date: dateStr })); goTo('camera') }; chatChoices.appendChild(b); chatChoices.classList.remove('hidden') }, 500) }, 500) } }
+    function scrollChat() { setTimeout(function () { chatBody.scrollTop = chatBody.scrollHeight }, 50) }
+
+    // ═══ CAMERA ═══
+    function startCamera() { var v = document.getElementById('camVideo'), fb = document.getElementById('camFallback'); if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) { navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } }).then(function (s) { v.srcObject = s; v.style.display = 'block'; fb.style.display = 'none' }).catch(function () { v.style.display = 'none'; fb.style.display = 'block' }) } else { v.style.display = 'none'; fb.style.display = 'block' } }
+    function capturePhoto() {
+      var vf = document.querySelector('.cam-viewfinder');
+      var fl = document.createElement('div');
+      fl.style.cssText = 'position:absolute;inset:0;background:white;z-index:10;opacity:1;transition:opacity .4s';
+      vf.appendChild(fl);
+      setTimeout(function () { fl.style.opacity = '0'; }, 50);
+      setTimeout(function () { fl.remove(); }, 500);
+      var v = document.getElementById('camVideo');
+      // ビデオが再生中かどうかチェック（videoWidthが0の場合は少し待ってリトライ）
+      function doCapture() {
+        if (v.srcObject) {
+          var vw = v.videoWidth > 0 ? v.videoWidth : (v.clientWidth || 480);
+          var vh = v.videoHeight > 0 ? v.videoHeight : (v.clientHeight || 640);
+          var maxDim = 480;
+          var sc = Math.min(maxDim / vw, maxDim / vh, 1);
+          var pc = document.createElement('canvas');
+          pc.width = Math.max(1, Math.floor(vw * sc));
+          pc.height = Math.max(1, Math.floor(vh * sc));
+          var pctx = pc.getContext('2d');
+          pctx.translate(pc.width, 0); pctx.scale(-1, 1);
+          pctx.drawImage(v, 0, 0, pc.width, pc.height);
+          try {
+            var dataUrl = pc.toDataURL('image/jpeg', 0.75);
+            localStorage.setItem('aimyPhotoRaw', dataUrl);
+            console.log('[AIMY] 写真を保存しました:', pc.width + 'x' + pc.height, Math.round(dataUrl.length / 1024) + 'KB');
+          } catch(e) { console.error('[AIMY] 写真の保存に失敗:', e); }
+          v.srcObject.getTracks().forEach(function (t) { t.stop(); });
+        } else {
+          console.warn('[AIMY] カメラストリームがありません');
+        }
+        setTimeout(function () { goTo('analyzing'); }, 300);
+      }
+      // videoWidthが0なら最大200ms待つ
+      if (v.srcObject && v.videoWidth === 0) {
+        setTimeout(doCapture, 200);
+      } else {
+        doCapture();
+      }
+    }
+
+    // ═══ ANALYZING ═══
+    function startAnalyzing() {
+      var f = document.getElementById('progressFill'), l = document.getElementById('analyzeLabel');
+      var steps = [
+        { p: 15, t: '顔の検出・位置合わせ中' },
+        { p: 30, t: 'シミ・色素沈着を検出中' },
+        { p: 45, t: 'シワ・たるみを解析中' },
+        { p: 60, t: 'テクスチャーを評価中' },
+        { p: 75, t: '赤み・炎症を検出中' },
+        { p: 88, t: '毛穴のマッピング中' },
+        { p: 95, t: 'AIが施術レコメンドを生成中' },
+        { p: 100, t: 'レポートを作成中' }
+      ];
+      f.style.width = '0%';
+
+      var raw = localStorage.getItem('aimyPhotoRaw');
+      localStorage.removeItem('aimyAnalysis');
+      localStorage.removeItem('aimyCosmeRecs');
+      localStorage.removeItem('aimyFaceMasked');
+      localStorage.removeItem('aimyShimi10y');
+      localStorage.removeItem('aimyShimi20y');
+      localStorage.removeItem('aimyTexture');
+      localStorage.removeItem('aimyKeana');
+      localStorage.removeItem('aimyAkami');
+
+      // ── Python API 呼び出しヘルパー ──
+      function callApi(endpoint, imageData, severity) {
+        return fetch(API_BASE_URL + endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: imageData, severity: severity })
+        }).then(function(r) { return r.json(); }).then(function(d) {
+          return d.result || null;
+        }).catch(function(e) {
+          console.warn('[AIMY] ' + endpoint + ' エラー:', e);
+          return null;
+        });
+      }
+
+      // ── Gemini 分析（元写真で並行実行）──
+      var geminiPromise = (raw && GEMINI_API_KEY)
+        ? analyzeWithGemini(raw).then(function(result) {
+            if (result) {
+              if (Array.isArray(result.recommendations) && result.recommendations.length > 0) {
+                localStorage.setItem('aimyCosmeRecs', JSON.stringify(result.recommendations));
+                console.log('[AIMY] コスメ推薦 保存完了 ' + result.recommendations.length + '件');
+              }
+              localStorage.setItem('aimyAnalysis', JSON.stringify(result));
+              console.log('[AIMY] Gemini完了 overall:', result.overall_score);
+            }
+          })
+        : Promise.resolve();
+
+      // ── 画像処理：① 顔マスク取得 → ② マスク画像で全処理 ──
+      var imagePromise = raw
+        ? callApi('/api/face-mask', raw, 1.0).then(function(masked) {
+            var input = masked || raw;
+            if (masked) {
+              localStorage.setItem('aimyFaceMasked', masked);
+              console.log('[AIMY] 顔マスク完了 → 各処理へ');
+            } else {
+              console.warn('[AIMY] 顔マスク失敗 → 元写真で続行');
+            }
+            // Python処理（シミマップ・シワ・テクスチャー・毛穴・赤み）
+            var pyPromise = Promise.all([
+              callApi('/api/shimi',   input, 1.2),
+              callApi('/api/shiwa',   input, 1.0),
+              callApi('/api/texture', input, 1.0),
+              callApi('/api/keana',   input, 1.0),
+              callApi('/api/akami',   input, 1.0)
+            ]).then(function(imgs) {
+              if (imgs[0]) { localStorage.setItem('aimyShimiMap', imgs[0]); console.log('[AIMY] シミマップ 完了'); }
+              if (imgs[1]) { localStorage.setItem('aimyShiwa',    imgs[1]); console.log('[AIMY] シワ 完了'); }
+              if (imgs[2]) { localStorage.setItem('aimyTexture',  imgs[2]); console.log('[AIMY] テクスチャー 完了'); }
+              if (imgs[3]) { localStorage.setItem('aimyKeana',    imgs[3]); console.log('[AIMY] 毛穴 完了'); }
+              if (imgs[4]) { localStorage.setItem('aimyAkami',    imgs[4]); console.log('[AIMY] 赤み 完了'); }
+            });
+            // Gemini画像生成（10年後・20年後）
+            var g10 = generateFutureWithGemini(input, 10).then(function(img) {
+              if (img) { localStorage.setItem('aimyShimi10y', img); console.log('[AIMY] Gemini 10年後 完了'); }
+            });
+            var g20 = generateFutureWithGemini(input, 20).then(function(img) {
+              if (img) { localStorage.setItem('aimyShimi20y', img); console.log('[AIMY] Gemini 20年後 完了'); }
+            });
+            return Promise.all([pyPromise, g10, g20]);
+          }).then(function() {})
+        : Promise.resolve();
+
+      // Gemini と画像処理を並行実行
+      var allPromises = Promise.all([geminiPromise, imagePromise]);
+      var animDone = false, apiDone = false;
+
+      // アニメーション完了フラグ
+      allPromises.then(function() {
+        apiDone = true;
+        console.log('[AIMY] 全API完了');
+        if (animDone) goTo('report');
+      }).catch(function(e) {
+        console.error('[AIMY] Promise エラー:', e);
+        apiDone = true;
+        if (animDone) goTo('report');
+      });
+
+      var i = 0;
+      function next() {
+        if (i >= steps.length) {
+          animDone = true;
+          // アニメーション終了 → API完了待ち（ウェイト表示）
+          f.style.width = '95%';
+          l.textContent = 'AI画像を生成しています...';
+          if (apiDone) goTo('report');
+          return;
+        }
+        f.style.width = steps[i].p + '%';
+        l.textContent = steps[i].t;
+        i++;
+        setTimeout(next, 500 + Math.random() * 400);
+      }
+      setTimeout(next, 300);
+    }
+
+    // ═══ REPORT ═══
+    function loadReport() { window.location.href = 'report-v3.html'; }
+
+    // ═══ IMAGE PROCESSING ═══
+
+    // Seeded random number generator
+    function mkRng(seed) {
+      var s = (seed >>> 0) || 1;
+      return function() { s = ((s * 1664525) + 1013904223) & 0x7fffffff; return s / 0x7fffffff; };
+    }
+
+    // Load image from data URL
+    function loadImg(src) {
+      return new Promise(function(resolve, reject) {
+        var img = new Image(); img.onload = function() { resolve(img); }; img.onerror = reject; img.src = src;
+      });
+    }
+
+    // Process all images from raw photo, store in localStorage
+    function processPhoto(rawDataUrl, concern) {
+      return loadImg(rawDataUrl).then(function(img) {
+        var W = img.naturalWidth || img.width, H = img.naturalHeight || img.height;
+        function make(fn) {
+          var c = document.createElement('canvas'); c.width = W; c.height = H;
+          var ctx = c.getContext('2d'); ctx.drawImage(img, 0, 0);
+          if (fn) fn(ctx, W, H);
+          return c.toDataURL('image/jpeg', 0.78);
+        }
+        var efMap = {
+          'シミ・くすみ':    [applyShimi, applyKusumi],
+          'シワ・たるみ':    [applyShiwa, applyTarumi],
+          '毛穴・テクスチャー': [applyKeana, applyTextureAge],
+          '赤み・敏感肌':    [applyAkami]
+        };
+        var efs = efMap[concern] || efMap['シミ・くすみ'];
+        var results = {
+          current:    rawDataUrl,
+          year10:     make(function(c,w,h){ efs.forEach(function(f){ f(c,w,h,0.45); }); }),
+          year20:     make(function(c,w,h){ efs.forEach(function(f){ f(c,w,h,0.85); }); }),
+          mapShimi:   make(function(c,w,h){ hmShimi(c,w,h); }),
+          mapShiwa:   make(function(c,w,h){ hmShiwa(c,w,h); }),
+          mapTexture: make(function(c,w,h){ hmTexture(c,w,h); }),
+          mapKeana:   make(function(c,w,h){ hmKeana(c,w,h); }),
+          mapAkami:   make(function(c,w,h){ hmAkami(c,w,h); }),
+          mapBuibetsu:make(function(c,w,h){ hmBuibetsu(c,w,h); }),
+          mapZentai:  make(function(c,w,h){ hmZentai(c,w,h); })
+        };
+        try { localStorage.setItem('aimyProcessedImages', JSON.stringify(results)); } catch(e) {}
+        return results;
+      });
+    }
+
+    // ── Aging effects ──
+
+    function applyShimi(ctx, w, h, sev) {
+      var rng = mkRng(1001); var count = Math.floor(sev * 45 + 8);
+      ctx.save();
+      for (var i = 0; i < count; i++) {
+        var zone = Math.floor(rng() * 4), x, y;
+        if (zone === 0) { x = (0.12 + rng() * 0.22) * w; y = (0.28 + rng() * 0.35) * h; }
+        else if (zone === 1) { x = (0.66 + rng() * 0.22) * w; y = (0.28 + rng() * 0.35) * h; }
+        else if (zone === 2) { x = (0.25 + rng() * 0.5) * w; y = (0.04 + rng() * 0.18) * h; }
+        else { x = (0.38 + rng() * 0.24) * w; y = (0.28 + rng() * 0.2) * h; }
+        var r = 5 + rng() * 14 * sev;
+        var alpha = 0.15 + rng() * 0.3 * sev;
+        var r1 = 80 + Math.floor(rng() * 55), g1 = 38 + Math.floor(rng() * 32), b1 = 8 + Math.floor(rng() * 15);
+        var gr = ctx.createRadialGradient(x, y, 0, x, y, r);
+        gr.addColorStop(0, 'rgba('+r1+','+g1+','+b1+','+(alpha*1.5)+')');
+        gr.addColorStop(0.55, 'rgba('+r1+','+g1+','+b1+','+alpha+')');
+        gr.addColorStop(1, 'rgba('+r1+','+g1+','+b1+',0)');
+        ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = gr;
+        ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    function applyKusumi(ctx, w, h, sev) {
+      ctx.save(); ctx.globalCompositeOperation = 'multiply';
+      ctx.fillStyle = 'rgba(155,135,115,' + (sev * 0.28) + ')'; ctx.fillRect(0, 0, w, h);
+      var gr = ctx.createRadialGradient(w*.5, h*.42, 0, w*.5, h*.42, w*.5);
+      gr.addColorStop(0, 'rgba(140,118,98,' + (sev * 0.18) + ')');
+      gr.addColorStop(1, 'rgba(140,118,98,0)');
+      ctx.fillStyle = gr; ctx.fillRect(0, 0, w, h);
+      ctx.restore();
+    }
+
+    function applyShiwa(ctx, w, h, sev) {
+      var lines = [
+        [.20,.12, .40,.10, .60,.10, .80,.12], [.22,.18, .40,.16, .60,.16, .78,.18],
+        [.24,.24, .42,.21, .58,.21, .76,.24],
+        [.72,.30, .78,.30, .83,.32, .85,.29], [.72,.33, .79,.34, .83,.36, .85,.37],
+        [.28,.30, .22,.30, .17,.32, .15,.29], [.28,.33, .21,.34, .17,.36, .15,.37],
+        [.35,.52, .30,.60, .30,.65, .35,.72], [.65,.52, .70,.60, .70,.65, .65,.72]
+      ];
+      ctx.save(); ctx.globalCompositeOperation = 'multiply';
+      ctx.strokeStyle = 'rgba(70,50,40,' + (sev * 0.55) + ')';
+      ctx.lineWidth = 1 + sev * 2; ctx.lineCap = 'round';
+      lines.forEach(function(l) {
+        ctx.beginPath(); ctx.moveTo(l[0]*w, l[1]*h);
+        ctx.bezierCurveTo(l[2]*w,l[3]*h, l[4]*w,l[5]*h, l[6]*w,l[7]*h);
+        ctx.stroke();
+      });
+      ctx.restore();
+    }
+
+    function applyTarumi(ctx, w, h, sev) {
+      ctx.save(); ctx.globalCompositeOperation = 'multiply';
+      [[.28,.78],[.72,.78],[.5,.82]].forEach(function(p) {
+        var gr = ctx.createRadialGradient(p[0]*w, p[1]*h, 0, p[0]*w, p[1]*h, w*.22);
+        gr.addColorStop(0, 'rgba(90,72,62,'+(sev*.28)+')');
+        gr.addColorStop(1, 'rgba(90,72,62,0)');
+        ctx.fillStyle = gr; ctx.fillRect(0, 0, w, h);
+      });
+      ctx.restore();
+    }
+
+    function applyKeana(ctx, w, h, sev) {
+      var rng = mkRng(3003); var count = Math.floor(sev * 320 + 60);
+      ctx.save(); ctx.globalCompositeOperation = 'multiply';
+      for (var i = 0; i < count; i++) {
+        var isNose = rng() < 0.5, x, y;
+        if (isNose) { x = (.38+rng()*.24)*w; y = (.36+rng()*.28)*h; }
+        else { x = (rng()<.5 ? (.10+rng()*.2) : (.70+rng()*.2))*w; y = (.28+rng()*.32)*h; }
+        var r = .6 + rng() * 1.8 * sev;
+        ctx.fillStyle = 'rgba(55,38,28,'+(0.22+rng()*.38*sev)+')';
+        ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    function applyTextureAge(ctx, w, h, sev) {
+      var nc = document.createElement('canvas'); nc.width = 64; nc.height = 64;
+      var nctx = nc.getContext('2d'); var rng = mkRng(4004);
+      var id = nctx.createImageData(64, 64);
+      for (var i = 0; i < id.data.length; i+=4) {
+        var v = Math.floor((rng()-.5)*110*sev+128);
+        id.data[i]=id.data[i+1]=id.data[i+2]=v; id.data[i+3]=Math.floor(sev*45);
+      }
+      nctx.putImageData(id, 0, 0);
+      ctx.save(); ctx.globalCompositeOperation = 'overlay';
+      ctx.fillStyle = ctx.createPattern(nc, 'repeat'); ctx.fillRect(0,0,w,h);
+      ctx.restore();
+    }
+
+    function applyAkami(ctx, w, h, sev) {
+      ctx.save(); ctx.globalCompositeOperation = 'source-over';
+      [{x:.25,y:.46,rx:.16,ry:.13},{x:.75,y:.46,rx:.16,ry:.13},{x:.5,y:.43,rx:.09,ry:.09}].forEach(function(z) {
+        var cx=z.x*w, cy=z.y*h, r=Math.max(z.rx*w, z.ry*h);
+        var gr = ctx.createRadialGradient(cx,cy,0,cx,cy,r);
+        gr.addColorStop(0,'rgba(215,55,55,'+(sev*.42)+')');
+        gr.addColorStop(.65,'rgba(195,75,75,'+(sev*.2)+')');
+        gr.addColorStop(1,'rgba(195,75,75,0)');
+        ctx.save(); ctx.translate(cx,cy); ctx.scale(z.rx*w/r,z.ry*h/r); ctx.translate(-cx,-cy);
+        ctx.fillStyle=gr; ctx.fillRect(0,0,w,h); ctx.restore();
+      });
+      ctx.restore();
+    }
+
+    // ── Heatmap overlays ──
+
+    function hmBase(ctx, w, h, spots, lineColor) {
+      ctx.save();
+      ctx.fillStyle='rgba(12,22,58,0.28)'; ctx.fillRect(0,0,w,h);
+      spots.forEach(function(s) {
+        var gr=ctx.createRadialGradient(s[0]*w,s[1]*h,0,s[0]*w,s[1]*h,s[2]*Math.min(w,h));
+        gr.addColorStop(0,s[3]); gr.addColorStop(.55,s[4]||s[3].replace(/[\d.]+\)$/,'0.28)')); gr.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.fillStyle=gr; ctx.fillRect(0,0,w,h);
+      });
+      for (var y=0; y<h; y+=4) { ctx.fillStyle='rgba(0,0,0,0.035)'; ctx.fillRect(0,y,w,1); }
+      ctx.strokeStyle=lineColor||'rgba(79,125,245,0.5)'; ctx.lineWidth=2;
+      ctx.strokeRect(1,1,w-2,h-2);
+      ctx.restore();
+    }
+
+    function hmShimi(ctx,w,h) {
+      hmBase(ctx,w,h,[
+        [.24,.42,.28,'rgba(238,115,18,0.72)','rgba(238,115,18,0.36)'],
+        [.76,.42,.28,'rgba(238,115,18,0.68)','rgba(238,115,18,0.32)'],
+        [.50,.14,.24,'rgba(218,155,35,0.58)','rgba(218,155,35,0.26)'],
+        [.50,.38,.13,'rgba(198,95,18,0.42)']
+      ],'rgba(240,120,20,0.5)');
+    }
+
+    function hmShiwa(ctx,w,h) {
+      hmBase(ctx,w,h,[
+        [.50,.16,.36,'rgba(75,115,240,0.62)','rgba(75,115,240,0.3)'],
+        [.18,.33,.16,'rgba(95,155,255,0.52)','rgba(95,155,255,0.26)'],
+        [.82,.33,.16,'rgba(95,155,255,0.52)','rgba(95,155,255,0.26)'],
+        [.34,.63,.13,'rgba(55,95,200,0.44)'],[.66,.63,.13,'rgba(55,95,200,0.44)']
+      ],'rgba(100,150,255,0.5)');
+      ctx.save(); ctx.strokeStyle='rgba(140,195,255,0.55)'; ctx.lineWidth=1.5; ctx.setLineDash([5,3]);
+      [[.20,.11,.80,.11],[.22,.17,.78,.17],[.24,.23,.76,.23]].forEach(function(l) {
+        ctx.beginPath(); ctx.moveTo(l[0]*w,l[1]*h); ctx.quadraticCurveTo(w*.5,(l[1]-.02)*h,l[2]*w,l[3]*h); ctx.stroke();
+      });
+      ctx.restore();
+    }
+
+    function hmTexture(ctx,w,h) {
+      hmBase(ctx,w,h,[
+        [.50,.40,.32,'rgba(45,195,95,0.52)','rgba(45,195,95,0.26)'],
+        [.50,.24,.22,'rgba(95,215,75,0.42)'],[.28,.50,.22,'rgba(38,175,115,0.36)'],
+        [.72,.50,.22,'rgba(38,175,115,0.36)']
+      ],'rgba(50,200,100,0.5)');
+    }
+
+    function hmKeana(ctx,w,h) {
+      hmBase(ctx,w,h,[
+        [.50,.42,.16,'rgba(155,55,215,0.68)','rgba(155,55,215,0.32)'],
+        [.26,.48,.20,'rgba(135,75,195,0.52)','rgba(135,75,195,0.26)'],
+        [.74,.48,.20,'rgba(135,75,195,0.52)','rgba(135,75,195,0.26)'],
+        [.50,.58,.11,'rgba(115,55,175,0.42)']
+      ],'rgba(160,60,220,0.5)');
+    }
+
+    function hmAkami(ctx,w,h) {
+      hmBase(ctx,w,h,[
+        [.24,.46,.24,'rgba(235,45,45,0.68)','rgba(235,45,45,0.32)'],
+        [.76,.46,.24,'rgba(235,45,45,0.68)','rgba(235,45,45,0.32)'],
+        [.50,.43,.13,'rgba(255,95,75,0.72)','rgba(255,95,75,0.36)']
+      ],'rgba(220,50,50,0.5)');
+    }
+
+    function hmBuibetsu(ctx,w,h) {
+      ctx.save();
+      ctx.fillStyle='rgba(8,18,50,0.32)'; ctx.fillRect(0,0,w,h);
+      var zones=[
+        {x:.50,y:.13,s:72,c:[79,125,245]},{x:.22,y:.47,s:65,c:[245,158,11]},
+        {x:.78,y:.47,s:68,c:[245,158,11]},{x:.50,y:.43,s:58,c:[212,66,92]},
+        {x:.50,y:.64,s:76,c:[34,197,94]},{x:.50,y:.80,s:80,c:[34,197,94]}
+      ];
+      var rad=Math.min(w,h)*.09;
+      zones.forEach(function(z) {
+        var cx=z.x*w, cy=z.y*h, c=z.c;
+        var gr=ctx.createRadialGradient(cx,cy,0,cx,cy,rad);
+        gr.addColorStop(0,'rgba('+c[0]+','+c[1]+','+c[2]+',0.58)');
+        gr.addColorStop(1,'rgba('+c[0]+','+c[1]+','+c[2]+',0)');
+        ctx.fillStyle=gr; ctx.beginPath(); ctx.arc(cx,cy,rad,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle='rgba(255,255,255,0.95)';
+        ctx.font='bold '+Math.floor(rad*.72)+'px Outfit,sans-serif';
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(z.s,cx,cy);
+      });
+      for (var y=0;y<h;y+=4){ctx.fillStyle='rgba(0,0,0,0.03)';ctx.fillRect(0,y,w,1);}
+      ctx.strokeStyle='rgba(79,125,245,0.5)';ctx.lineWidth=2;ctx.strokeRect(1,1,w-2,h-2);
+      ctx.restore();
+    }
+
+    function hmZentai(ctx,w,h) {
+      ctx.save();
+      ctx.fillStyle='rgba(8,18,55,0.32)'; ctx.fillRect(0,0,w,h);
+      var gr=ctx.createRadialGradient(w*.5,h*.44,0,w*.5,h*.44,w*.55);
+      gr.addColorStop(0,'rgba(79,125,245,0.48)'); gr.addColorStop(.55,'rgba(0,184,212,0.28)'); gr.addColorStop(1,'rgba(0,184,212,0)');
+      ctx.fillStyle=gr; ctx.fillRect(0,0,w,h);
+      var cr=Math.min(w,h)*.11;
+      ctx.fillStyle='rgba(8,18,55,0.72)'; ctx.beginPath(); ctx.arc(w*.84,h*.09,cr,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,0.96)';
+      ctx.font='bold '+Math.floor(cr*.95)+'px Outfit,sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('72',w*.84,h*.09);
+      ctx.font=Math.floor(cr*.45)+'px "Noto Sans JP",sans-serif';
+      ctx.fillStyle='rgba(255,255,255,0.72)'; ctx.fillText('総合',w*.84,h*.09+cr*.62);
+      for(var y=0;y<h;y+=4){ctx.fillStyle='rgba(0,0,0,0.03)';ctx.fillRect(0,y,w,1);}
+      ctx.strokeStyle='rgba(79,125,245,0.5)';ctx.lineWidth=2;ctx.strokeRect(1,1,w-2,h-2);
+      ctx.restore();
+    }
+
+    // Hero slide rotation
+    var heroSlides = ['hs0', 'hs1', 'hs2', 'hs3', 'hs4'];
+    var heroCur = 0;
+    var heroTimer = null;
+    function goHeroSlide(idx) {
+      heroCur = idx;
+      heroSlides.forEach(function (id, i) { var el = document.getElementById(id); if (el) el.className = i === idx ? 'hero-slide active' : 'hero-slide' });
+      document.querySelectorAll('.hero-dot').forEach(function (d, i) { d.className = i === idx ? 'hero-dot on' : 'hero-dot' });
+      if (heroTimer) clearInterval(heroTimer);
+      heroTimer = setInterval(nextHeroSlide, 5000);
+    }
+    function nextHeroSlide() { heroCur++; if (heroCur >= heroSlides.length) heroCur = 0; goHeroSlide(heroCur) }
+    heroTimer = setInterval(nextHeroSlide, 5000);
+  </script>
+</body>
+
+</html>
