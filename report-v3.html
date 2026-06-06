@@ -2954,7 +2954,7 @@
         + '\n\n最適な5製品を選び次のJSON配列のみ返してください（他テキスト不要）:\n[{"id":番号,"reason":"理由40字以内"},×5]';
 
       console.log('[AIMY cosme] フォールバックAPIコール開始');
-      fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + apiKey, {
+      fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + apiKey, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
