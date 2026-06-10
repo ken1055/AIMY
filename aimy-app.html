@@ -1964,25 +1964,40 @@
     // Python API のベース URL（空 = 同一オリジン、本番は Railway の URL を config.js に設定）
     var API_BASE_URL   = (window.AIMY_CONFIG && window.AIMY_CONFIG.API_BASE_URL)   || '';
 
-    // Gemini で10年後/20年後の顔画像を生成
+    // AI で10年後/20年後の顔画像を完全新規生成
     async function generateFutureWithGemini(photoDataUrl, years) {
       if (!GEMINI_API_KEY) return null;
-      var parts = photoDataUrl.split(',');
-      var base64 = parts[1];
-      var mimeType = parts[0].split(':')[1].split(';')[0];
-      var prompt = years === 10
-        ? 'この顔写真の人物の10年後の自然な老化シミュレーション画像を生成してください。シミ・小じわ・毛穴の目立ちを適度に加え、同じ人物として自然に老化した姿を表現してください。元の構図・アングルを維持してください。'
-        : 'この顔写真の人物の20年後の自然な老化シミュレーション画像を生成してください。シミ・シワ・たるみ・ほうれい線を明確に加え、同じ人物として自然に老化した姿を表現してください。元の構図・アングルを維持してください。';
-      // 試みるモデルの順番（上から順に試す）
-      var imageModels = [
-        'gemini-2.0-flash-exp',
-        'gemini-2.0-flash-preview-image-generation',
-        'gemini-2.5-flash'
+      var imgParts = photoDataUrl.split(',');
+      var base64 = imgParts[1];
+      var mimeType = imgParts[0].split(':')[1].split(';')[0];
+
+      var agingDetails = years === 10
+        ? 'early age spots on cheeks and forehead, fine lines around eyes (crow\'s feet) and mouth corners, ' +
+          'slightly deepened nasolabial folds, enlarged pores, slightly dull and uneven skin tone, early jawline laxity'
+        : 'numerous dark age spots covering cheeks, forehead and temples, deep nasolabial folds from nose to chin, ' +
+          'pronounced forehead wrinkles and deep crow\'s feet, significant skin sagging and jowls, ' +
+          'rough skin texture with large pores, dull yellowish uneven skin tone, loss of facial volume';
+
+      var geminiPrompt =
+        'Using the person in this photo as reference, generate a BRAND NEW photorealistic portrait image ' +
+        'showing what this same person would look like ' + years + ' years from now ' +
+        'with ZERO cosmetic treatments or anti-aging skincare. ' +
+        'Natural aging effects must be clearly visible: ' + agingDetails + '. ' +
+        'Create a completely new portrait — not a filtered version of the input. ' +
+        'Photorealistic, natural lighting, same face angle, high detail on skin texture.';
+
+      // Step 1: Gemini画像生成モデル（写真を参照して同一人物の老化）
+      // 高品質な Pro 系から順に試行
+      var geminiImageModels = [
+        'nano-banana-pro-preview',
+        'gemini-3-pro-image',
+        'gemini-3.1-flash-image',
+        'gemini-2.5-flash-image'
       ];
-      for (var mi = 0; mi < imageModels.length; mi++) {
-        var modelName = imageModels[mi];
+      for (var mi = 0; mi < geminiImageModels.length; mi++) {
+        var modelName = geminiImageModels[mi];
         try {
-          console.log('[AIMY] Gemini画像生成 試行: ' + modelName + ' (' + years + '年後)');
+          console.log('[AIMY] ' + years + '年後 試行: ' + modelName);
           var resp = await fetch(
             'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent?key=' + GEMINI_API_KEY,
             {
@@ -1991,31 +2006,79 @@
               body: JSON.stringify({
                 contents: [{ parts: [
                   { inline_data: { mime_type: mimeType, data: base64 } },
-                  { text: prompt }
+                  { text: geminiPrompt }
                 ]}],
                 generationConfig: { responseModalities: ['IMAGE', 'TEXT'] }
               })
             }
           );
           var json = await resp.json();
-          console.log('[AIMY] Gemini画像生成 レスポンス ' + modelName + ':', JSON.stringify(json).slice(0, 400));
-          if (!resp.ok) {
-            console.warn('[AIMY] ' + modelName + ' 失敗:', json.error && json.error.message);
-            continue;
-          }
-          var parts = (json.candidates && json.candidates[0] && json.candidates[0].content && json.candidates[0].content.parts) || [];
-          var imgPart = parts.find(function(p) { return p.inlineData; });
-          if (!imgPart) {
-            console.warn('[AIMY] ' + modelName + ': 画像パートなし。parts:', JSON.stringify(parts).slice(0,300));
-            continue;
-          }
-          console.log('[AIMY] 画像生成成功:', modelName);
+          console.log('[AIMY] ' + modelName + ' レスポンス:', JSON.stringify(json).slice(0, 200));
+          if (!resp.ok) { console.warn('[AIMY] ' + modelName + ' 失敗:', (json.error || {}).message); continue; }
+          var resParts = (((json.candidates || [])[0] || {}).content || {}).parts || [];
+          var imgPart = resParts.find(function(p) { return p.inlineData; });
+          if (!imgPart) { console.warn('[AIMY] ' + modelName + ': 画像パートなし'); continue; }
+          console.log('[AIMY] Gemini画像生成成功: ' + modelName + ' (' + years + '年後)');
           return 'data:' + imgPart.inlineData.mimeType + ';base64,' + imgPart.inlineData.data;
-        } catch (e) {
-          console.error('[AIMY] ' + modelName + ' エラー:', e);
-        }
+        } catch (e) { console.warn('[AIMY] ' + modelName + ' エラー:', e.message); }
       }
-      console.error('[AIMY] 全モデルで画像生成失敗 (' + years + '年後)');
+
+      // Step 2: Gemini で人物描写を取得 → Imagen 4 で完全新規生成
+      try {
+        console.log('[AIMY] ' + years + '年後: Imagen 4 用に人物描写を取得中...');
+        var descResp = await fetch(
+          'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + GEMINI_API_KEY,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [
+                { inline_data: { mime_type: mimeType, data: base64 } },
+                { text: 'Describe this person for an image generation prompt: gender, apparent age range, ethnicity, skin tone, face shape. 1-2 sentences, English only, factual.' }
+              ]}],
+              generationConfig: { temperature: 0.1 }
+            })
+          }
+        );
+        var descJson = await descResp.json();
+        var dParts = (((descJson.candidates || [])[0] || {}).content || {}).parts || [];
+        var description = dParts.filter(function(p) { return !p.thought; }).map(function(p) { return p.text || ''; }).join('').trim();
+        if (description) {
+          var imagenPrompt =
+            'Photorealistic portrait photograph. ' + description +
+            ' The person is ' + years + ' years older with no cosmetic treatments. ' +
+            'Clearly visible: ' + agingDetails + '. ' +
+            'Studio lighting, neutral background, high quality, sharp skin texture detail.';
+
+          var imagenModels = ['imagen-4.0-generate-001', 'imagen-4.0-fast-generate-001'];
+          for (var ii = 0; ii < imagenModels.length; ii++) {
+            var iName = imagenModels[ii];
+            try {
+              console.log('[AIMY] Imagen試行: ' + iName);
+              var iResp = await fetch(
+                'https://generativelanguage.googleapis.com/v1beta/models/' + iName + ':predict?key=' + GEMINI_API_KEY,
+                {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    instances: [{ prompt: imagenPrompt }],
+                    parameters: { sampleCount: 1, aspectRatio: '3:4' }
+                  })
+                }
+              );
+              var iJson = await iResp.json();
+              console.log('[AIMY] Imagen ' + iName + ' レスポンス:', JSON.stringify(iJson).slice(0, 200));
+              if (!iResp.ok) { console.warn('[AIMY] ' + iName + ' 失敗:', (iJson.error || {}).message); continue; }
+              var pred = (iJson.predictions || [])[0];
+              if (!pred || !pred.bytesBase64Encoded) { console.warn('[AIMY] ' + iName + ': 画像データなし'); continue; }
+              console.log('[AIMY] Imagen生成成功: ' + iName + ' (' + years + '年後)');
+              return 'data:' + (pred.mimeType || 'image/png') + ';base64,' + pred.bytesBase64Encoded;
+            } catch (e) { console.warn('[AIMY] ' + iName + ' エラー:', e.message); }
+          }
+        }
+      } catch (e) { console.warn('[AIMY] Imagen 4 フロー エラー:', e.message); }
+
+      console.warn('[AIMY] 全AI生成失敗 → Pythonフォールバック (' + years + '年後)');
       return null;
     }
 
@@ -2094,7 +2157,7 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: mimeType, data: base64 } }] }],
-              generationConfig: { temperature: 0.3, maxOutputTokens: 3000 }
+              generationConfig: { temperature: 0.3 }
             })
           }
         );
@@ -2203,14 +2266,14 @@
     function startAnalyzing() {
       var f = document.getElementById('progressFill'), l = document.getElementById('analyzeLabel');
       var steps = [
-        { p: 15, t: '顔の検出・位置合わせ中' },
-        { p: 30, t: 'シミ・色素沈着を検出中' },
-        { p: 45, t: 'シワ・たるみを解析中' },
-        { p: 60, t: 'テクスチャーを評価中' },
-        { p: 75, t: '赤み・炎症を検出中' },
-        { p: 88, t: '毛穴のマッピング中' },
-        { p: 95, t: 'AIが施術レコメンドを生成中' },
-        { p: 100, t: 'レポートを作成中' }
+        { p: 12, t: '顔の検出・位置合わせ中' },
+        { p: 24, t: 'シミ・色素沈着を検出中' },
+        { p: 36, t: 'シワ・たるみを解析中' },
+        { p: 48, t: 'テクスチャーを評価中' },
+        { p: 60, t: '赤み・炎症を検出中' },
+        { p: 72, t: '毛穴のマッピング中' },
+        { p: 84, t: 'AIが施術レコメンドを生成中' },
+        { p: 92, t: '10年後・20年後の画像をAI生成中' }
       ];
       f.style.width = '0%';
 
@@ -2276,13 +2339,27 @@
               if (imgs[3]) { localStorage.setItem('aimyKeana',    imgs[3]); console.log('[AIMY] 毛穴 完了'); }
               if (imgs[4]) { localStorage.setItem('aimyAkami',    imgs[4]); console.log('[AIMY] 赤み 完了'); }
             });
-            // Gemini画像生成（10年後・20年後）
-            var g10 = generateFutureWithGemini(input, 10).then(function(img) {
-              if (img) { localStorage.setItem('aimyShimi10y', img); console.log('[AIMY] Gemini 10年後 完了'); }
-            });
-            var g20 = generateFutureWithGemini(input, 20).then(function(img) {
-              if (img) { localStorage.setItem('aimyShimi20y', img); console.log('[AIMY] Gemini 20年後 完了'); }
-            });
+            // 10年後・20年後: Gemini新規生成を試み、失敗時はPython処理にフォールバック
+            function makeAgingPromise(years) {
+              return generateFutureWithGemini(input, years).then(function(img) {
+                if (img) {
+                  localStorage.setItem(years === 10 ? 'aimyShimi10y' : 'aimyShimi20y', img);
+                  console.log('[AIMY] Gemini ' + years + '年後 完了');
+                  return;
+                }
+                // Gemini失敗 → Python APIにフォールバック
+                return callApi('/api/aging', input, years).then(function(pyImg) {
+                  if (pyImg) {
+                    localStorage.setItem(years === 10 ? 'aimyShimi10y' : 'aimyShimi20y', pyImg);
+                    console.log('[AIMY] Python ' + years + '年後 完了（フォールバック）');
+                  } else {
+                    console.warn('[AIMY] ' + years + '年後 生成失敗（Gemini・Python両方）');
+                  }
+                });
+              });
+            }
+            var g10 = makeAgingPromise(10);
+            var g20 = makeAgingPromise(20);
             return Promise.all([pyPromise, g10, g20]);
           }).then(function() {})
         : Promise.resolve();
@@ -2291,25 +2368,29 @@
       var allPromises = Promise.all([geminiPromise, imagePromise]);
       var animDone = false, apiDone = false;
 
-      // アニメーション完了フラグ
+      // 100% → レポートを作成中 → 遷移
+      function finishAndGo() {
+        f.style.width = '100%';
+        l.textContent = 'レポートを作成中';
+        setTimeout(function() { goTo('report'); }, 400);
+      }
+
       allPromises.then(function() {
         apiDone = true;
         console.log('[AIMY] 全API完了');
-        if (animDone) goTo('report');
+        if (animDone) finishAndGo();
       }).catch(function(e) {
         console.error('[AIMY] Promise エラー:', e);
         apiDone = true;
-        if (animDone) goTo('report');
+        if (animDone) finishAndGo();
       });
 
       var i = 0;
       function next() {
         if (i >= steps.length) {
           animDone = true;
-          // アニメーション終了 → API完了待ち（ウェイト表示）
-          f.style.width = '95%';
-          l.textContent = 'AI画像を生成しています...';
-          if (apiDone) goTo('report');
+          // アニメーション終了 → APIが完了するまで92%のまま待機（戻らない）
+          if (apiDone) finishAndGo();
           return;
         }
         f.style.width = steps[i].p + '%';

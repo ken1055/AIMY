@@ -15,7 +15,7 @@ import os
 from flask import Flask, Response, jsonify, request, send_from_directory
 from flask_cors import CORS
 
-from processing import process_akami, process_face_mask, process_keana, process_shimi, process_shiwa, process_texture
+from processing import process_akami, process_aging, process_face_mask, process_keana, process_shimi, process_shiwa, process_texture
 
 app = Flask(__name__, static_folder="assets", static_url_path="/assets")
 
@@ -131,6 +131,14 @@ def api_akami():
     if err:
         return err
     return _run(process_akami, img_bytes, severity)
+
+
+@app.route("/api/aging", methods=["POST"])
+def api_aging():
+    img_bytes, severity, err = _parse_request()
+    if err:
+        return err
+    return _run(process_aging, img_bytes, severity)
 
 
 @app.route("/health")

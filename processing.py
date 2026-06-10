@@ -495,3 +495,100 @@ def process_shiwa(img_bytes: bytes, severity: float = 1.0, seed: int = 42) -> by
 
     print(f"[AIMY] shiwa: severity={severity}")
     return encode_png(result, alpha_ch)
+
+
+# ═══════════════════════════════════════════
+#  老化シミュレーション画像生成
+# ═══════════════════════════════════════════
+
+def process_aging(img_bytes: bytes, severity: float = 10.0, **_) -> bytes:
+    """
+    老化シミュレーション画像を生成する。
+    severity=10 → 10年後、severity=20 → 20年後
+    効果: 肌くすみ・黄ばみ / 老人斑 / テクスチャ粗化 / ほうれい線陰影
+    """
+    years = max(1, int(round(float(severity))))
+    age_ratio = years / 20.0  # 10年=0.5, 20年=1.0
+
+    bgr, alpha_ch = decode_image(img_bytes)
+    h, w = bgr.shape[:2]
+    face_mask = (alpha_ch > 0).astype(np.uint8) * 255
+    face_mask_bool = (alpha_ch > 0)
+
+    if not np.any(face_mask_bool):
+        return encode_png(bgr, alpha_ch)
+
+    # 画像サイズに比例したスケール係数（基準500px）
+    scale = min(h, w) / 500.0
+
+    rng = np.random.default_rng(42)
+    result = bgr.astype(np.float32)
+
+    # ── 1. 肌トーンを沈める（明度低下 + 黄ばみ） ──
+    dark_factor = 1.0 - 0.08 * age_ratio       # 10年=0.96, 20年=0.92
+    yellow_factor = 1.0 - 0.10 * age_ratio     # 10年=0.95, 20年=0.90（B低下=黄ばみ）
+    dark_map = np.where(face_mask_bool, dark_factor, 1.0).astype(np.float32)
+    result *= dark_map[:, :, np.newaxis]
+    yellow_map = np.where(face_mask_bool, yellow_factor, 1.0).astype(np.float32)
+    result[:, :, 0] *= yellow_map  # Blue チャネルを下げて黄みを追加
+    result = np.clip(result, 0, 255)
+
+    # ── 2. シミ・老人斑 ──
+    xn = np.linspace(0, 1, w).reshape(1, w).astype(np.float32)  # (1, w)
+    yn = np.linspace(0, 1, h).reshape(h, 1).astype(np.float32)  # (h, 1)
+
+    # 頬（左右）とおでこにスポットが出やすい重みマップ (h, w)
+    cheek_w = np.clip(
+        np.exp(-((xn - 0.22) ** 2 / 0.016 + (yn - 0.63) ** 2 / 0.040)) +
+        np.exp(-((xn - 0.78) ** 2 / 0.016 + (yn - 0.63) ** 2 / 0.040)) +
+        0.4 * np.exp(-((xn - 0.50) ** 2 / 0.060 + (yn - 0.25) ** 2 / 0.040)),
+        0, 1
+    ).astype(np.float32)
+
+    dist = cv2.distanceTransform(face_mask, cv2.DIST_L2, 5)
+    edge_w = np.clip(1.0 - dist / (float(dist.max()) * 0.65 + 1e-6), 0, 1).astype(np.float32)
+
+    exclude = build_face_exclude(bgr, h, w, dilate=15)
+
+    spot_prob = (cheek_w * 0.75 + edge_w * 0.25) * (0.020 * age_ratio)
+    noise = rng.random((h, w)).astype(np.float32)
+    spot_seed = (noise < spot_prob) & face_mask_bool & (exclude == 0)
+
+    ks = max(5, min(29, int((7 + 6 * age_ratio) * scale)))
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (ks, ks))
+    spot_dilated = cv2.dilate(spot_seed.astype(np.uint8) * 255, kernel)
+    spot_soft = cv2.GaussianBlur(
+        spot_dilated.astype(np.float32), (0, 0), sigmaX=float(ks) * 0.55
+    ) / 255.0
+
+    spot_alpha = np.clip(spot_soft * (0.35 + 0.22 * age_ratio), 0, 0.58)
+    brown = np.array([35.0, 72.0, 125.0])  # BGR: 茶色
+    result += spot_alpha[:, :, np.newaxis] * (brown - result)
+    result = np.clip(result, 0, 255)
+
+    # ── 3. テクスチャ粗さ強調（しわ感） ──
+    result_u8 = result.astype(np.uint8)
+    blurred = cv2.GaussianBlur(result_u8, (0, 0), sigmaX=3.0 * scale)
+    sharp_amount = 0.20 + 0.40 * age_ratio  # 10年=0.40, 20年=0.60
+    result = np.clip(
+        result_u8.astype(np.float32) + sharp_amount * (result_u8.astype(np.float32) - blurred.astype(np.float32)),
+        0, 255
+    )
+
+    # ── 4. ほうれい線（口角→鼻翼の陰影） ──
+    nasal_w = np.clip(
+        np.exp(-((xn - 0.34) ** 2 / 0.006 + (yn - 0.73) ** 2 / 0.022)) +
+        np.exp(-((xn - 0.66) ** 2 / 0.006 + (yn - 0.73) ** 2 / 0.022)),
+        0, 1
+    ).astype(np.float32)
+
+    darken = 55.0 * age_ratio  # 10年=27.5px, 20年=55px 暗くする
+    result -= nasal_w[:, :, np.newaxis] * darken
+    result = np.clip(result, 0, 255)
+
+    # ── 5. 顔マスク外は元の画素に戻す ──
+    result_u8 = result.astype(np.uint8)
+    result_u8[~face_mask_bool] = bgr[~face_mask_bool]
+
+    print(f"[AIMY] aging: years={years} age_ratio={age_ratio:.2f} {w}x{h}")
+    return encode_png(result_u8, alpha_ch)

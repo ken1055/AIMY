@@ -16,7 +16,7 @@ from socketserver import ThreadingMixIn
 from urllib.parse import urlparse
 
 try:
-    from processing import process_akami, process_face_mask, process_keana, process_shimi, process_shiwa, process_texture
+    from processing import process_akami, process_aging, process_face_mask, process_keana, process_shimi, process_shiwa, process_texture
     _PROCESSING_OK = True
 except ImportError as e:
     _PROCESSING_OK = False
@@ -27,6 +27,28 @@ PORT = 8080
 
 class AimyHandler(SimpleHTTPRequestHandler):
     """静的ファイル配信 + /api/* エンドポイント"""
+
+    def do_GET(self):
+        # HTMLファイルはキャッシュさせない
+        if self.path.split('?')[0].endswith('.html') or self.path == '/':
+            self.send_response(200)
+            path = self.path.split('?')[0].lstrip('/')
+            if not path:
+                path = 'index.html'
+            try:
+                with open(path, 'rb') as f:
+                    body = f.read()
+                self.send_header('Content-Type', 'text/html; charset=utf-8')
+                self.send_header('Content-Length', str(len(body)))
+                self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate')
+                self.send_header('Pragma', 'no-cache')
+                self._cors()
+                self.end_headers()
+                self.wfile.write(body)
+            except FileNotFoundError:
+                self.send_error(404)
+        else:
+            super().do_GET()
 
     def do_OPTIONS(self):
         self.send_response(200)
@@ -46,6 +68,7 @@ class AimyHandler(SimpleHTTPRequestHandler):
             "/api/texture":   process_texture,
             "/api/keana":     process_keana,
             "/api/akami":     process_akami,
+            "/api/aging":     process_aging,
         }
         processor = routes.get(path)
         if processor is None:

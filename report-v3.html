@@ -1649,16 +1649,6 @@
             </svg></span>項目別の詳細分析</div>
         <div class="ss">画像解析による項目ごとの肌分析結果</div>
 
-        <!-- マップの見方 -->
-        <div
-          style="padding:16px;border-radius:14px;background:rgba(0,0,0,.03);border:1px solid rgba(255,255,255,.4);margin-bottom:20px">
-          <div style="font-size:13px;font-weight:700;color:var(--g800);margin-bottom:12px">📊 解析マップの見方</div>
-          <div style="font-size:11px;color:var(--g500);line-height:1.8">
-            <strong style="color:var(--g700)">スコアの目安：</strong>数値が低いほど症状が軽く良好な状態です。各エリアの色分けで、緑＝良好 → 黄＝注意 → 赤＝要ケア
-            を示しています。解析マップでは各項目の検出結果を顔画像上にオーバーレイし、ケアの優先部位を視覚的に確認できます。
-          </div>
-        </div>
-
         <!-- 01 シミ -->
         <div class="ab">
           <div class="ah"><span class="n">01</span>シミ</div>
@@ -2065,14 +2055,18 @@
       // Dots + Labels
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       for (var i = 0; i < n; i++) {
+        // 表示用値（肌年齢は実年齢、その他はスコア）
+        var displayV = (sc[i].inv != null) ? sc[i].inv : sc[i].v;
         var r = R * (sc[i].v / 100);
         ctx.fillStyle = sc[i].c; ctx.beginPath(); ctx.arc(px(i, r), py(i, r), 6, 0, Math.PI * 2); ctx.fill();
         var ar = R * (sc[i].a / 100);
         ctx.fillStyle = '#f59e0b'; ctx.globalAlpha = 0.6; ctx.beginPath(); ctx.arc(px(i, ar), py(i, ar), 5, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1;
-        ctx.fillStyle = sc[i].c; ctx.font = 'bold 22px Outfit';
-        ctx.fillText(sc[i].v, px(i, R + 30), py(i, R + 30));
-        ctx.fillStyle = '#6b7280'; ctx.font = '500 18px "Noto Sans JP"';
-        ctx.fillText(sc[i].l, px(i, R + 55), py(i, R + 55));
+        // ラベル（内側・グレー・小さめ）
+        ctx.fillStyle = '#6b7280'; ctx.font = '500 15px "Noto Sans JP"';
+        ctx.fillText(sc[i].l, px(i, R + 28), py(i, R + 28));
+        // 数値（外側・カラー・太字・十分な間隔）
+        ctx.fillStyle = sc[i].c; ctx.font = 'bold 19px Outfit';
+        ctx.fillText(displayV, px(i, R + 58), py(i, R + 58));
       }
 
       // Score bars
@@ -2081,7 +2075,8 @@
       var bc = { シミ: 'bgn', 隠れジミ: 'ba', 毛穴: 'bn', キメ: 'bgn', くすみ: 'ba', 赤み: 'brd', シワ: 'bn', フェイスライン: 'bgn', 左右差: 'bn', 肌年齢: 'ba' };
       sc.forEach(function (s, i) {
         var row = document.createElement('div'); row.className = 'sr';
-        row.innerHTML = '<span class="sn">' + s.l + '</span><div class="bo"><div class="bf ' + (bc[s.l] || 'bn') + '" style="width:' + s.v + '%;animation-delay:' + i * 0.08 + 's"></div></div><span class="sv">' + s.v + '</span>';
+        var displayV = (s.inv != null) ? s.inv : s.v;
+        row.innerHTML = '<span class="sn">' + s.l + '</span><div class="bo"><div class="bf ' + (bc[s.l] || 'bn') + '" style="width:' + s.v + '%;animation-delay:' + i * 0.08 + 's"></div></div><span class="sv">' + displayV + '</span>';
         ls.appendChild(row);
       });
     };
@@ -2097,7 +2092,7 @@
       { l: 'シワ', v: 72, a: 70, c: '#4f7df5' },
       { l: 'フェイスライン', v: 76, a: 68, c: '#22c55e' },
       { l: '左右差', v: 70, a: 72, c: '#4f7df5' },
-      { l: '肌年齢', v: 69, a: 65, c: '#f59e0b' }
+      { l: '肌年齢', v: 69, inv: 31, a: 60, c: '#4f7df5' }
     ]);
 
     // ═══ CHAT DATA INJECTION ═══
@@ -2404,7 +2399,11 @@
       var keanaScore = (d.keana || {}).score || 74;
       var shiwaScore = (d.shiwa || {}).score || 72;
       var facelineScore = (d.shiwa || {}).face_line || Math.round((shiwaScore + 4));
-      var hadanenScore = d.skin_age != null ? Math.min(d.skin_age, 99) : 69;
+      // 肌年齢: 実年齢が低いほど良いので「100 - 実年齢」をスコアにし、表示は実年齢のまま
+      var skinAgeActual = d.skin_age != null ? Math.min(d.skin_age, 99) : 31;
+      var hadanenScore = Math.max(0, Math.min(100, 100 - skinAgeActual));
+      // 平均値もスコアとして反転（平均肌年齢40想定 → スコア60）
+      var hadanenAvg = 100 - 40;
       var sc = [
         { l: 'シミ', v: shimiScore, a: avg['シミ'], c: colorFor(shimiScore) },
         { l: '隠れジミ', v: kakureScore, a: avg['隠れジミ'], c: colorFor(kakureScore) },
@@ -2415,7 +2414,7 @@
         { l: 'シワ', v: shiwaScore, a: avg['シワ'], c: colorFor(shiwaScore) },
         { l: 'フェイスライン', v: facelineScore, a: avg['フェイスライン'], c: colorFor(facelineScore) },
         { l: '左右差', v: 70, a: avg['左右差'], c: colorFor(70) },
-        { l: '肌年齢', v: hadanenScore, a: avg['肌年齢'], c: colorFor(hadanenScore) }
+        { l: '肌年齢', v: hadanenScore, inv: skinAgeActual, a: hadanenAvg, c: colorFor(hadanenScore) }
       ];
       window.drawRadar(sc);
     }
@@ -2959,20 +2958,27 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.4, maxOutputTokens: 512 }
+          generationConfig: { temperature: 0.4 }
         })
       })
-      .then(function (res) { return res.json(); })
+      .then(function (res) {
+        console.log('[AIMY cosme] HTTPステータス:', res.status);
+        return res.json();
+      })
       .then(function (json) {
+        console.log('[AIMY cosme] レスポンス全体:', JSON.stringify(json).slice(0, 500));
         if (json.error) { console.error('[AIMY cosme] APIエラー:', json.error.message); showTemplate(); return; }
-        var text = (((((json.candidates || [])[0] || {}).content || {}).parts || [])[0] || {}).text || '';
+        var parts = (((json.candidates || [])[0] || {}).content || {}).parts || [];
+        console.log('[AIMY cosme] parts数:', parts.length, 'parts:', JSON.stringify(parts).slice(0, 300));
+        // thinking モデルは thought:true のパートを除外して本文のみ結合
+        var text = parts.filter(function(p){ return !p.thought; }).map(function(p){ return p.text || ''; }).join('');
         text = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+        console.log('[AIMY cosme] テキスト:', text.slice(0, 200));
         var s = text.indexOf('['), e = text.lastIndexOf(']');
-        if (s === -1 || e === -1) { showTemplate(); return; }
+        if (s === -1 || e === -1) { console.warn('[AIMY cosme] JSON配列なし'); showTemplate(); return; }
         var recs = null;
-        try { recs = JSON.parse(text.slice(s, e + 1)); } catch (err) { showTemplate(); return; }
-        if (!Array.isArray(recs) || !recs.length) { showTemplate(); return; }
-        // 次回のために保存
+        try { recs = JSON.parse(text.slice(s, e + 1)); } catch (err) { console.warn('[AIMY cosme] JSONパースエラー:', err); showTemplate(); return; }
+        if (!Array.isArray(recs) || !recs.length) { console.warn('[AIMY cosme] 配列空'); showTemplate(); return; }
         try { localStorage.setItem('aimyCosmeRecs', JSON.stringify(recs)); } catch(e) {}
         if (!renderRecs(recs)) showTemplate();
       })
